@@ -13,6 +13,9 @@ packages:
   swift-markdown-ui:
     url: https://github.com/gonzalezreal/swift-markdown-ui
     from: "2.4.0"
+  Splash:
+    url: https://github.com/JohnSundell/Splash
+    from: "0.16.0"
 targets:
   AIMemoryReader:
     type: application
@@ -32,3 +35,5 @@ targets:
     dependencies:
       - package: swift-markdown-ui
         product: MarkdownUI
+      - package: Splash
+        product: Splash

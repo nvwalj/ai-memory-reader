@@ -32,6 +32,8 @@ struct MarkdownDetailView: View {
     let fileChangeToken: Int
     @State private var rawContent: String?
     @State private var loadError: String?
+    @State private var tocEntries: [TOCEntry] = []
+    @State private var scrollProxy: ScrollViewProxy?
 
     var body: some View {
         VStack(spacing: 0) {
@@ -58,13 +60,27 @@ struct MarkdownDetailView: View {
             if let error = loadError {
                 errorView(error)
             } else if let raw = rawContent {
-                ScrollView {
-                    Markdown(raw)
-                        .markdownTheme(.gitHub)
-                        .markdownCodeSyntaxHighlighter(.plain)
-                        .textSelection(.enabled)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(24)
+                ScrollViewReader { proxy in
+                    ScrollView {
+                        VStack(alignment: .leading, spacing: 0) {
+                            // TOC at top of document
+                            if !tocEntries.isEmpty {
+                                TOCView(entries: tocEntries) { entry in
+                                    withAnimation(.easeInOut(duration: 0.3)) {
+                                        proxy.scrollTo(entry.anchor, anchor: .top)
+                                    }
+                                }
+                                .padding(.horizontal, 24)
+                                .padding(.top, 16)
+                                .padding(.bottom, 8)
+                            }
+
+                            // Markdown content with anchored headings
+                            MarkdownWithAnchors(content: raw, tocEntries: tocEntries)
+                                .padding(.horizontal, 24)
+                                .padding(.vertical, 16)
+                        }
+                    }
                 }
             } else {
                 ProgressView()
@@ -88,6 +104,7 @@ struct MarkdownDetailView: View {
                 return
             }
             rawContent = text
+            tocEntries = TOCParser.parse(text)
         } catch {
             loadError = error.localizedDescription
         }
@@ -108,7 +125,21 @@ struct MarkdownDetailView: View {
     }
 }
 
-// MARK: - Plain code syntax highlighter (no external dependency)
+/// Renders markdown content with scroll anchors on headings
+struct MarkdownWithAnchors: View {
+    let content: String
+    let tocEntries: [TOCEntry]
+
+    var body: some View {
+        Markdown(content)
+            .markdownTheme(.memoryReader)
+            .markdownCodeSyntaxHighlighter(.splash)
+            .textSelection(.enabled)
+            .frame(maxWidth: .infinity, alignment: .leading)
+    }
+}
+
+// MARK: - Plain code syntax highlighter (fallback)
 
 struct PlainCodeSyntaxHighlighter: CodeSyntaxHighlighter {
     func highlightCode(_ code: String, language: String?) -> Text {

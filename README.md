@@ -1,5 +1,7 @@
 # AI Memory Reader
 
+[中文文档](README_CN.md)
+
 A native macOS & iOS app for browsing, reading, and editing AI agent memory files — beautifully rendered, instantly accessible.
 
 ![AI Memory Reader](home.png)

@@ -1,12 +1,50 @@
 import MarkdownUI
 import SwiftUI
 
+// MARK: - Platform color helpers
+
+private extension Color {
+    static var platformControlBackground: Color {
+        #if os(macOS)
+        Color(.controlBackgroundColor)
+        #else
+        Color(.secondarySystemGroupedBackground)
+        #endif
+    }
+
+    static var platformSeparator: Color {
+        #if os(macOS)
+        Color(.separatorColor)
+        #else
+        Color(.separator)
+        #endif
+    }
+}
+
+// MARK: - Font size helpers for Dynamic Type
+
+private var baseFontSize: CGFloat {
+    #if os(macOS)
+    return 16
+    #else
+    return 15
+    #endif
+}
+
+private var headingScale: CGFloat {
+    #if os(macOS)
+    return 1.0
+    #else
+    return 0.9
+    #endif
+}
+
 extension MarkdownUI.Theme {
     /// Custom theme optimized for reading AI memory files
     @MainActor static let memoryReader = Theme()
         // MARK: - Text
         .text {
-            FontSize(16)
+            FontSize(baseFontSize)
             ForegroundColor(.primary)
         }
         // MARK: - Headings
@@ -15,7 +53,7 @@ extension MarkdownUI.Theme {
                 .markdownMargin(top: 28, bottom: 16)
                 .markdownTextStyle {
                     FontWeight(.bold)
-                    FontSize(32)
+                    FontSize(32 * headingScale)
                     ForegroundColor(.primary)
                 }
         }
@@ -24,7 +62,7 @@ extension MarkdownUI.Theme {
                 .markdownMargin(top: 24, bottom: 12)
                 .markdownTextStyle {
                     FontWeight(.bold)
-                    FontSize(26)
+                    FontSize(26 * headingScale)
                     ForegroundColor(.primary)
                 }
         }
@@ -33,7 +71,7 @@ extension MarkdownUI.Theme {
                 .markdownMargin(top: 20, bottom: 10)
                 .markdownTextStyle {
                     FontWeight(.semibold)
-                    FontSize(22)
+                    FontSize(22 * headingScale)
                     ForegroundColor(.primary)
                 }
         }
@@ -42,7 +80,7 @@ extension MarkdownUI.Theme {
                 .markdownMargin(top: 16, bottom: 8)
                 .markdownTextStyle {
                     FontWeight(.semibold)
-                    FontSize(18)
+                    FontSize(18 * headingScale)
                     ForegroundColor(.primary)
                 }
         }
@@ -51,7 +89,7 @@ extension MarkdownUI.Theme {
                 .markdownMargin(top: 14, bottom: 6)
                 .markdownTextStyle {
                     FontWeight(.medium)
-                    FontSize(16)
+                    FontSize(16 * headingScale)
                     ForegroundColor(.primary)
                 }
         }
@@ -60,7 +98,7 @@ extension MarkdownUI.Theme {
                 .markdownMargin(top: 12, bottom: 6)
                 .markdownTextStyle {
                     FontWeight(.medium)
-                    FontSize(14)
+                    FontSize(14 * headingScale)
                     ForegroundColor(.secondary)
                 }
         }
@@ -69,7 +107,7 @@ extension MarkdownUI.Theme {
             FontFamilyVariant(.monospaced)
             FontSize(14)
             ForegroundColor(.pink)
-            BackgroundColor(Color(.controlBackgroundColor).opacity(0.6))
+            BackgroundColor(Color.platformControlBackground.opacity(0.6))
         }
         .codeBlock { configuration in
             VStack(alignment: .leading, spacing: 0) {
@@ -91,7 +129,7 @@ extension MarkdownUI.Theme {
                         .padding(.vertical, 8)
                 }
             }
-            .background(Color(.controlBackgroundColor).opacity(0.6))
+            .background(Color.platformControlBackground.opacity(0.6))
             .clipShape(RoundedRectangle(cornerRadius: 8))
             .markdownMargin(top: 8, bottom: 8)
         }
@@ -104,7 +142,7 @@ extension MarkdownUI.Theme {
                 configuration.label
                     .markdownTextStyle {
                         ForegroundColor(.secondary)
-                        FontSize(15)
+                        FontSize(baseFontSize - 1)
                     }
                     .padding(.leading, 12)
             }
@@ -114,10 +152,10 @@ extension MarkdownUI.Theme {
         .table { configuration in
             configuration.label
                 .markdownTableBorderStyle(
-                    TableBorderStyle(color: Color(.separatorColor))
+                    TableBorderStyle(color: Color.platformSeparator)
                 )
                 .markdownTableBackgroundStyle(
-                    .alternatingRows(Color.clear, Color(.controlBackgroundColor).opacity(0.3))
+                    .alternatingRows(Color.clear, Color.platformControlBackground.opacity(0.3))
                 )
                 .markdownMargin(top: 8, bottom: 8)
         }

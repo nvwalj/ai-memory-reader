@@ -141,6 +141,13 @@ struct SidebarView: View {
                     UserDefaults.standard.set(path, forKey: "lastLocalFolderPath")
                     appState.loadDirectory(url)
                 }
+                .contextMenu {
+                    Button(role: .destructive) {
+                        appState.removeRecentFolder(path)
+                    } label: {
+                        Label("Remove from Recent", systemImage: "trash")
+                    }
+                }
             }
         }
     }

@@ -247,6 +247,12 @@ final class AppState {
 
     // MARK: - Recent Folders
 
+    func removeRecentFolder(_ path: String) {
+        var folders = recentFolders
+        folders.removeAll { $0 == path }
+        recentFolders = folders
+    }
+
     private func addRecentFolder(_ path: String) {
         var folders = recentFolders
         folders.removeAll { $0 == path }

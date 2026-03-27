@@ -1,5 +1,10 @@
 import Foundation
 
+extension Notification.Name {
+    static let fileWatcherDidDetectChange = Notification.Name("fileWatcherDidDetectChange")
+}
+
+#if os(macOS)
 /// Watches a directory tree for .md file changes using FSEvents
 final class FileWatcher: Sendable {
     private let path: String
@@ -45,7 +50,4 @@ final class FileWatcher: Sendable {
         FSEventStreamRelease(stream)
     }
 }
-
-extension Notification.Name {
-    static let fileWatcherDidDetectChange = Notification.Name("fileWatcherDidDetectChange")
-}
+#endif

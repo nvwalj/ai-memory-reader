@@ -173,3 +173,4 @@ struct AttributedStringOutputFormat: OutputFormat {
         }
     }
 }
+#endif

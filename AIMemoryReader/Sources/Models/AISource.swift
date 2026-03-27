@@ -68,24 +68,21 @@ extension AISource {
         AISource(
             id: "openclaw",
             name: "OpenClaw",
-            iconName: "brain.head.profile",
-            emoji: "🦞",
+            iconName: "ant",
             color: .orange,
             path: ".openclaw/workspace"
         ),
         AISource(
             id: "claude",
             name: "Claude Code",
-            iconName: "terminal",
-            emoji: "🟤",
-            color: Color(red: 0.76, green: 0.55, blue: 0.25), // amber/brown
+            iconName: "chevron.left.forwardslash.chevron.right",
+            color: Color(red: 0.76, green: 0.55, blue: 0.25),
             path: ".claude"
         ),
         AISource(
             id: "codex",
             name: "Codex",
-            iconName: "cpu",
-            emoji: "🤖",
+            iconName: "terminal",
             color: .green,
             path: ".codex"
         ),
@@ -93,15 +90,13 @@ extension AISource {
             id: "gemini",
             name: "Gemini",
             iconName: "sparkles",
-            emoji: "✨",
             color: .blue,
             path: ".gemini"
         ),
         AISource(
             id: "continue",
             name: "Continue",
-            iconName: "play.fill",
-            emoji: "▶️",
+            iconName: "play.circle",
             color: .purple,
             path: ".continue"
         ),
@@ -109,7 +104,6 @@ extension AISource {
             id: "cursor",
             name: "Cursor",
             iconName: "cursorarrow.rays",
-            emoji: "🔵",
             color: .cyan,
             path: ".cursor"
         ),
@@ -117,16 +111,14 @@ extension AISource {
             id: "aider",
             name: "Aider",
             iconName: "wrench",
-            emoji: "🔧",
             color: .gray,
             path: ".aider"
         ),
         AISource(
             id: "copilot",
             name: "GitHub Copilot",
-            iconName: "octagon",
-            emoji: "🐙",
-            color: Color(white: 0.25), // dark
+            iconName: "airplane",
+            color: Color(white: 0.35),
             path: ".config/github-copilot"
         ),
     ]
@@ -154,7 +146,6 @@ extension AISource {
                 id: "custom:\(path)",
                 name: url.lastPathComponent,
                 iconName: "folder",
-                emoji: "📁",
                 color: .secondary,
                 path: path,
                 isCustom: true

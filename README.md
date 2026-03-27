@@ -1,34 +1,50 @@
 # AI Memory Reader
 
-A native macOS app for browsing and reading AI agent memory files — beautifully rendered, instantly accessible.
+A native macOS & iOS app for browsing, reading, and editing AI agent memory files — beautifully rendered, instantly accessible.
 
-![AI Memory Reader Screenshot](screenshots/placeholder.png)
-<!-- TODO: Replace with actual screenshots -->
+![AI Memory Reader](home.png)
 
 ## Features
 
-- **Beautiful Markdown Rendering** — GitHub-style markdown with code blocks, tables, lists, and more (powered by MarkdownUI)
-- **Auto-Discover AI Sources** — Automatically detects Claude/OpenClaw, OpenAI/Codex, and Gemini memory directories
+### Reading
+- **Beautiful Markdown Rendering** — GitHub-style with code blocks, tables, lists, and more (powered by MarkdownUI)
+- **Auto-Discover AI Sources** — Automatically detects OpenClaw memory directories
 - **Today Panel** — Highlights today's memory file for quick access
 - **File Tree Navigation** — Browse markdown files with an expandable sidebar
+- **Table of Contents** — Right sidebar TOC with click-to-jump navigation
 - **Dark & Light Themes** — Follows system appearance
 - **File Watching** — Auto-refreshes when files change on disk
-- **Local Folder Support** — Open any folder containing markdown files
-- **Keyboard Shortcuts** — ⌘O to open folders, native macOS navigation
+- **Full-Text Search** — Search across all files in the current directory
+
+### Editing
+- **Edit Mode** — Toggle between reading and editing with ⌘E
+- **Syntax Highlighting** — Headers, bold, italic, code blocks, links
+- **Line Numbers** — Built-in line number ruler
+- **Auto-Save** — Saves automatically after 2 seconds of inactivity
+- **Manual Save** — ⌘S with visual "Saved" confirmation
+
+### AI Tool Integration
+- **URL Scheme** — `aimemoryreader://open?path=/path/to/file.md&heading=Heading`
+- **CLI** — `aimr open /path/to/file.md --heading "Title"`
+- Let AI agents open and navigate to specific files and headings
+
+### Cross-Platform
+- **macOS** — Full-featured with sidebar, TOC, edit mode
+- **iPhone** — Read-only with native navigation and Files app integration
 
 ## Supported AI Sources
 
 | AI Source | Directory | Key Files |
 |-----------|-----------|-----------|
-| Claude / OpenClaw | `~/.openclaw/workspace/` | MEMORY.md, SOUL.md, AGENTS.md, memory/*.md |
-| OpenAI / Codex | `~/.codex/` | AGENTS.md, instructions.md |
-| Gemini | `~/.gemini/` | GEMINI.md |
+| OpenClaw | `~/.openclaw/workspace/` | MEMORY.md, SOUL.md, AGENTS.md, memory/*.md |
+
+Also supports opening any local folder or individual .md file.
 
 ## Installation
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/user/ai-memory-reader.git
+   git clone https://github.com/nvwalj/ai-memory-reader.git
    cd ai-memory-reader
    ```
 
@@ -44,29 +60,45 @@ A native macOS app for browsing and reading AI agent memory files — beautifull
 
 4. Build and run (⌘R)
 
+### CLI Setup (optional)
+
+Copy the `aimr` script to your PATH:
+```bash
+cp aimr /usr/local/bin/
+chmod +x /usr/local/bin/aimr
+```
+
+Then use:
+```bash
+aimr open ~/.openclaw/workspace/MEMORY.md
+aimr open ~/.openclaw/workspace/MEMORY.md --heading "About Me"
+```
+
 ### Requirements
 
-- macOS 15.0+
+- macOS 15.0+ / iOS 17.0+
 - Xcode 16.0+
 - Swift 6.0
 
 ## Tech Stack
 
-- **UI:** SwiftUI + NavigationSplitView
+- **UI:** SwiftUI (NavigationSplitView on Mac, NavigationStack on iPhone)
 - **Markdown:** [MarkdownUI](https://github.com/gonzalezreal/swift-markdown-ui) (GitHub theme)
+- **Editor:** NSTextView with custom syntax highlighting
 - **State:** @Observable macro
 - **File Watching:** FSEvents
 - **Project:** XcodeGen + SPM
 
-## Roadmap
+## Keyboard Shortcuts
 
-- [ ] Edit mode (inline markdown editing)
-- [ ] iPhone / iPad adaptation
-- [ ] AI tool integration (CLI / URL Scheme / MCP)
-- [ ] Multi-window support
-- [ ] Export to PDF
-- [ ] Custom AI source paths
-- [ ] iCloud sync
+| Shortcut | Action |
+|----------|--------|
+| ⌘O | Open file or folder |
+| ⌘E | Toggle edit/read mode |
+| ⌘S | Save (in edit mode) |
+| ⌘F | Focus search |
+| ⌘1 | Switch to OpenClaw source |
+| ⌘2 | Open local files |
 
 ## License
 

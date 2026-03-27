@@ -4,8 +4,7 @@
 专为查阅 AI 工作记忆而设计的 Mac 原生 Markdown 阅读器。
 
 ## 核心痛点
-- AI 大模型（Claude/OpenClaw、Codex/OpenAI、Gemini）都用 .md 文件记录上下文/记忆
-- 分散在不同目录，没有统一入口
+- AI 大模型（如 OpenClaw）用 .md 文件记录上下文/记忆
 - 现有编辑器太重，不针对"AI 记忆"场景
 - 用户只想快速翻阅
 
@@ -13,7 +12,7 @@
 
 ### ✅ 做
 - 完美的 Markdown 阅读体验（渲染、排版、代码高亮、中英文混排）
-- 自动发现 AI 记忆目录（Claude/OpenClaw、Codex/OpenAI、Gemini）
+- 自动发现 AI 记忆目录（OpenClaw）
 - 文件树侧边栏
 - 本地文件/文件夹选择
 - 全文搜索
@@ -40,9 +39,9 @@
 
 | AI | 路径 | 关键文件 |
 |---|---|---|
-| Claude/OpenClaw | ~/.openclaw/workspace/ | MEMORY.md, SOUL.md, AGENTS.md, memory/*.md |
-| OpenAI/Codex | ~/.codex/ | AGENTS.md, instructions.md |
-| Gemini | ~/.gemini/ | GEMINI.md |
+| OpenClaw | ~/.openclaw/workspace/ | MEMORY.md, SOUL.md, AGENTS.md, memory/*.md |
+
+> 注：Claude/Codex/Gemini 不在本地存储记忆文件，只有 OpenClaw 有本地工作区。可通过 "Local Files…" 打开任意文件夹。
 
 ## 里程碑
 - M1: 基础框架 + 文件树 + Markdown 渲染
@@ -62,6 +61,58 @@
 
 ## 开发日志
 （每个重要节点记录在下方）
+
+---
+### 2026-03-26 — M5 完成 ✅
+**本地文件选择 + 快捷键 + 最近文件**
+
+已实现功能：
+- 增强 ⌘O：同时支持打开文件夹和单个 .md 文件
+- 键盘快捷键：
+  - ⌘O: 打开文件/文件夹
+  - ⌘F: 聚焦搜索栏
+  - ⌘1: 切换到 OpenClaw 源
+  - ⌘2: 打开本地文件
+- 最近文件列表：最近 5 个打开的文件夹，持久化到 UserDefaults
+- 侧边栏 "Recent" 区域，点击可快速重新打开
+
+---
+### 2026-03-26 — M4 完成 ✅
+**打磨阅读体验**
+
+已实现功能：
+- 代码块语法高亮：集成 Splash（Swift），其他语言基础关键字高亮
+- 自定义 MemoryReader 主题：
+  - 正文 16pt，行距 1.6x
+  - 标题清晰层级（H1: 32pt → H6: 14pt）
+  - 代码块带语言标签 + 圆角背景
+  - 引用块左侧彩色竖线
+  - 表格带边框 + 斑马纹（zebra striping）
+  - 行内代码粉色 + 背景色
+- TOC（目录）：自动从 H1-H3 生成，可折叠，点击跳转
+- 中英文混排排版优化
+
+新增文件：
+- `SplashCodeSyntaxHighlighter.swift` — 语法高亮
+- `MemoryReaderTheme.swift` — 自定义 MarkdownUI 主题
+- `TOCView.swift` — 目录组件
+
+---
+### 2026-03-26 — M3 完成 ✅
+**搜索 + 文件监听 + 自动刷新**
+
+已实现功能：
+- 简化 AI 源列表：移除 Codex 和 Gemini，仅保留 OpenClaw
+- 侧边栏搜索栏：全文搜索所有 .md 文件
+- 搜索结果显示文件名、匹配行、行号
+- 点击搜索结果导航到文件
+- FSEvents 文件监听：.md 文件变化时自动刷新文件树和内容
+- 当前查看的文件变化时自动重载内容
+- 刷新时保持当前选中状态
+
+新增文件：
+- `FileWatcher.swift` — FSEvents 文件监听
+- `SearchService.swift` — 全文搜索服务
 
 ---
 ### 2026-03-26 — Plan 确认

@@ -272,10 +272,16 @@ struct AISourceRow: View {
 
     var body: some View {
         HStack(spacing: 8) {
-            Image(systemName: source.iconName)
-                .font(.system(size: 16))
-                .foregroundColor(source.color)
-                .frame(width: 22)
+            if let emoji = source.emoji {
+                Text(emoji)
+                    .font(.system(size: 16))
+                    .frame(width: 22)
+            } else {
+                Image(systemName: source.iconName)
+                    .font(.system(size: 16))
+                    .foregroundColor(source.color)
+                    .frame(width: 22)
+            }
             Text(source.name)
                 .font(.system(size: 13))
                 .lineLimit(1)

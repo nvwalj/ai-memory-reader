@@ -33,52 +33,62 @@ struct MarkdownDetailView: View {
     @State private var rawContent: String?
     @State private var loadError: String?
     @State private var tocEntries: [TOCEntry] = []
-    @State private var scrollProxy: ScrollViewProxy?
+    @State private var sections: [MarkdownSection] = []
+    @State private var activeEntryID: String?
+    @State private var showTOC = true
+    @State private var scrollTarget: String?
 
     var body: some View {
         VStack(spacing: 0) {
-            // Title bar
-            HStack {
-                Image(systemName: "doc.text")
-                    .foregroundColor(.accentColor)
-                Text(fileNode.name)
-                    .font(.headline)
-                Spacer()
-                if let raw = rawContent {
-                    Text("\(raw.count) chars")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
-            }
-            .padding(.horizontal, 20)
-            .padding(.vertical, 10)
-            .background(.bar)
-
+            titleBar
             Divider()
 
-            // Content
             if let error = loadError {
                 errorView(error)
-            } else if let raw = rawContent {
-                ScrollViewReader { proxy in
-                    ScrollView {
-                        VStack(alignment: .leading, spacing: 0) {
-                            // TOC at top of document
-                            if !tocEntries.isEmpty {
-                                TOCView(entries: tocEntries) { entry in
-                                    withAnimation(.easeInOut(duration: 0.3)) {
-                                        proxy.scrollTo(entry.anchor, anchor: .top)
-                                    }
+            } else if rawContent != nil {
+                HStack(spacing: 0) {
+                    // Main markdown content
+                    ScrollViewReader { proxy in
+                        ScrollView {
+                            LazyVStack(alignment: .leading, spacing: 0) {
+                                ForEach(sections) { section in
+                                    Markdown(section.content)
+                                        .markdownTheme(.memoryReader)
+                                        .markdownCodeSyntaxHighlighter(.splash)
+                                        .textSelection(.enabled)
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                        .padding(.horizontal, 24)
+                                        .padding(.vertical, 2)
+                                        .id(section.id)
+                                        .onAppear {
+                                            // Update active TOC entry when section scrolls into view
+                                            if tocEntries.contains(where: { $0.id == section.id }) {
+                                                activeEntryID = section.id
+                                            }
+                                        }
                                 }
-                                .padding(.horizontal, 24)
-                                .padding(.top, 16)
-                                .padding(.bottom, 8)
                             }
+                            .padding(.vertical, 16)
+                        }
+                        .onChange(of: scrollTarget) { _, newValue in
+                            if let target = newValue {
+                                withAnimation(.easeInOut(duration: 0.3)) {
+                                    proxy.scrollTo(target, anchor: .top)
+                                }
+                                scrollTarget = nil
+                            }
+                        }
+                    }
 
-                            // Markdown content with anchored headings
-                            MarkdownWithAnchors(content: raw, tocEntries: tocEntries)
-                                .padding(.horizontal, 24)
-                                .padding(.vertical, 16)
+                    // TOC sidebar on right
+                    if showTOC && !tocEntries.isEmpty {
+                        Divider()
+                        TOCSidebarView(
+                            entries: tocEntries,
+                            activeEntryID: activeEntryID
+                        ) { entry in
+                            activeEntryID = entry.id
+                            scrollTarget = entry.id
                         }
                     }
                 }
@@ -95,6 +105,36 @@ struct MarkdownDetailView: View {
         }
     }
 
+    private var titleBar: some View {
+        HStack {
+            Image(systemName: "doc.text")
+                .foregroundColor(.accentColor)
+            Text(fileNode.name)
+                .font(.headline)
+            Spacer()
+            if let raw = rawContent {
+                Text("\(raw.count) chars")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+            if !tocEntries.isEmpty {
+                Button {
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        showTOC.toggle()
+                    }
+                } label: {
+                    Image(systemName: "sidebar.right")
+                        .foregroundColor(showTOC ? .accentColor : .secondary)
+                }
+                .buttonStyle(.plain)
+                .help(showTOC ? "Hide Table of Contents" : "Show Table of Contents")
+            }
+        }
+        .padding(.horizontal, 20)
+        .padding(.vertical, 10)
+        .background(.bar)
+    }
+
     private func loadFile() async {
         loadError = nil
         do {
@@ -105,6 +145,7 @@ struct MarkdownDetailView: View {
             }
             rawContent = text
             tocEntries = TOCParser.parse(text)
+            sections = MarkdownSplitter.split(text, entries: tocEntries)
         } catch {
             loadError = error.localizedDescription
         }
@@ -122,20 +163,6 @@ struct MarkdownDetailView: View {
                 .foregroundColor(.secondary)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-    }
-}
-
-/// Renders markdown content with scroll anchors on headings
-struct MarkdownWithAnchors: View {
-    let content: String
-    let tocEntries: [TOCEntry]
-
-    var body: some View {
-        Markdown(content)
-            .markdownTheme(.memoryReader)
-            .markdownCodeSyntaxHighlighter(.splash)
-            .textSelection(.enabled)
-            .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
 

@@ -4,6 +4,7 @@ struct AISource: Identifiable, Hashable {
     let id: String
     let name: String
     let iconName: String  // SF Symbol name
+    let emoji: String?  // optional emoji to use instead of SF Symbol
     let color: Color
     let path: String  // relative to home directory
 
@@ -34,6 +35,7 @@ extension AISource {
             id: "openclaw",
             name: "OpenClaw",
             iconName: "brain.head.profile",
+            emoji: "🦞",
             color: .orange,
             path: ".openclaw/workspace"
         ),

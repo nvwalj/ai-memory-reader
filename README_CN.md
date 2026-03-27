@@ -114,4 +114,4 @@ aimr open ~/.openclaw/workspace/MEMORY.md --heading "关于我"
 
 ## 许可证
 
-MIT
+[GPL-3.0](LICENSE)

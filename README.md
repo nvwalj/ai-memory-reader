@@ -104,4 +104,4 @@ aimr open ~/.openclaw/workspace/MEMORY.md --heading "About Me"
 
 ## License
 
-MIT
+[GPL-3.0](LICENSE)

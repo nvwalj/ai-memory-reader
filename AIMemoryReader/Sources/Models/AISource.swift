@@ -134,11 +134,9 @@ extension AISource {
 
     // MARK: - Custom sources (UserDefaults)
 
-    private static let customSourcesKey = "customAISourcePaths"
-
-    /// Load custom source paths from UserDefaults
+    /// Load custom source paths from SettingsStore (iCloud synced)
     static func loadCustomSources() -> [AISource] {
-        let paths = UserDefaults.standard.stringArray(forKey: customSourcesKey) ?? []
+        let paths = SettingsStore.shared.customAISourcePaths
         return paths.compactMap { path in
             let url = URL(fileURLWithPath: path)
             guard FileManager.default.fileExists(atPath: path) else { return nil }
@@ -155,17 +153,17 @@ extension AISource {
 
     /// Add a custom source path
     static func addCustomSource(path: String) {
-        var paths = UserDefaults.standard.stringArray(forKey: customSourcesKey) ?? []
+        var paths = SettingsStore.shared.customAISourcePaths
         guard !paths.contains(path) else { return }
         paths.append(path)
-        UserDefaults.standard.set(paths, forKey: customSourcesKey)
+        SettingsStore.shared.customAISourcePaths = paths
     }
 
     /// Remove a custom source path
     static func removeCustomSource(path: String) {
-        var paths = UserDefaults.standard.stringArray(forKey: customSourcesKey) ?? []
+        var paths = SettingsStore.shared.customAISourcePaths
         paths.removeAll { $0 == path }
-        UserDefaults.standard.set(paths, forKey: customSourcesKey)
+        SettingsStore.shared.customAISourcePaths = paths
     }
 
     /// All available sources: auto-detected + custom

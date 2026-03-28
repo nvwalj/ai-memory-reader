@@ -13,7 +13,7 @@ final class AppState {
     var availableSources: [AISource] = []
     var selectedSourceID: String? {
         didSet {
-            UserDefaults.standard.set(selectedSourceID, forKey: "lastSelectedSourceID")
+            SettingsStore.shared.lastSelectedSourceID = selectedSourceID
         }
     }
 
@@ -41,8 +41,8 @@ final class AppState {
     // MARK: - Recent Folders
 
     var recentFolders: [String] {
-        get { UserDefaults.standard.stringArray(forKey: "recentFolders") ?? [] }
-        set { UserDefaults.standard.set(newValue, forKey: "recentFolders") }
+        get { SettingsStore.shared.recentFolders }
+        set { SettingsStore.shared.recentFolders = newValue }
     }
 
     // MARK: - URL Scheme handling
@@ -52,7 +52,7 @@ final class AppState {
 
     init() {
         availableSources = AISource.detectAllAvailable()
-        selectedSourceID = UserDefaults.standard.string(forKey: "lastSelectedSourceID")
+        selectedSourceID = SettingsStore.shared.lastSelectedSourceID
     }
 
     /// Refresh the available sources list (after adding/removing custom sources)
@@ -115,7 +115,7 @@ final class AppState {
         #if os(macOS)
         // Try to restore local folder
         if selectedSourceID == "local",
-           let savedPath = UserDefaults.standard.string(forKey: "lastLocalFolderPath") {
+           let savedPath = SettingsStore.shared.lastLocalFolderPath {
             let url = URL(fileURLWithPath: savedPath)
             if FileManager.default.fileExists(atPath: savedPath) {
                 loadDirectory(url)
@@ -155,7 +155,7 @@ final class AppState {
             if url.hasDirectoryPath {
                 selectedSourceID = "local"
                 isSingleFileMode = false
-                UserDefaults.standard.set(url.path(percentEncoded: false), forKey: "lastLocalFolderPath")
+                SettingsStore.shared.lastLocalFolderPath = url.path(percentEncoded: false)
                 addRecentFolder(url.path(percentEncoded: false))
                 loadDirectory(url)
                 startWatching(url)

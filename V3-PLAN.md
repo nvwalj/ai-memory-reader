@@ -50,3 +50,20 @@
 - 新增 ⌘P 快捷键和 File → Export PDF… 菜单项
 - 通过 Notification (.exportPDF) 从菜单传递到 DetailView
 - macOS build 验证通过
+
+### 2026-03-27 — V3.2 iCloud Settings Sync ✅
+- 新增 SettingsStore.swift — 封装 NSUbiquitousKeyValueStore + UserDefaults
+  - iCloud 优先读取，不可用时降级到 UserDefaults
+  - 双写：同时写入 iCloud 和 UserDefaults
+  - 监听 didChangeExternallyNotification 实现 iCloud → local 同步
+  - 首次启动自动迁移已有 UserDefaults 数据到 iCloud
+- 替换了 AppState 和 AISource 中所有直接使用 UserDefaults 的地方：
+  - recentFolders
+  - customAISourcePaths
+  - lastSelectedSourceID
+  - lastLocalFolderPath
+- 创建了 entitlements 文件（macOS + iOS），含 ubiquity-kvstore-identifier
+  - 未在 build settings 中启用（需要 code signing），entitlements 文件随代码提供
+  - 配置好 signing 后添加 CODE_SIGN_ENTITLEMENTS 即可
+- Sendable 安全：SettingsStore 标记为 @unchecked Sendable
+- macOS build 验证通过

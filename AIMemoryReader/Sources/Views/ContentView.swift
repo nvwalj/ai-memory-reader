@@ -1,4 +1,5 @@
 import SwiftUI
+import UniformTypeIdentifiers
 
 struct ContentView: View {
     @Environment(AppState.self) private var appState
@@ -18,6 +19,7 @@ struct ContentView: View {
 struct MacContentView: View {
     @Environment(AppState.self) private var appState
     @State private var columnVisibility: NavigationSplitViewVisibility = .automatic
+    @State private var isDropTargeted = false
 
     var body: some View {
         NavigationSplitView(columnVisibility: $columnVisibility) {
@@ -34,6 +36,71 @@ struct MacContentView: View {
         }
         .onChange(of: appState.isSingleFileMode) { _, isSingle in
             columnVisibility = isSingle ? .detailOnly : .automatic
+        }
+        .onDrop(of: [.fileURL], isTargeted: $isDropTargeted) { providers in
+            handleDrop(providers)
+            return true
+        }
+    }
+
+    private func handleDrop(_ providers: [NSItemProvider]) {
+        var collectedURLs: [URL] = []
+        let group = DispatchGroup()
+
+        for provider in providers {
+            guard provider.hasItemConformingToTypeIdentifier(UTType.fileURL.identifier) else { continue }
+            group.enter()
+            provider.loadItem(forTypeIdentifier: UTType.fileURL.identifier, options: nil) { item, _ in
+                defer { group.leave() }
+                guard let data = item as? Data,
+                      let url = URL(dataRepresentation: data, relativeTo: nil, isAbsolute: true) else { return }
+                collectedURLs.append(url)
+            }
+        }
+
+        group.notify(queue: .main) {
+            processDroppedURLs(collectedURLs)
+        }
+    }
+
+    private func processDroppedURLs(_ urls: [URL]) {
+        guard !urls.isEmpty else { return }
+
+        let fm = FileManager.default
+        var isDir: ObjCBool = false
+
+        // Check if any URL is a directory
+        if let first = urls.first,
+           urls.count == 1,
+           fm.fileExists(atPath: first.path(percentEncoded: false), isDirectory: &isDir),
+           isDir.boolValue {
+            // Single folder dropped — load as directory
+            appState.selectedSourceID = "local"
+            appState.isSingleFileMode = false
+            appState.loadDirectory(first)
+            return
+        }
+
+        // Filter to .md files only
+        let mdFiles = urls.filter { $0.pathExtension.lowercased() == "md" }
+        guard !mdFiles.isEmpty else { return }
+
+        if mdFiles.count == 1 {
+            // Single .md file — open in single file mode
+            appState.openSingleFile(mdFiles[0])
+        } else {
+            // Multiple .md files — load the common parent directory
+            let parentDir = mdFiles[0].deletingLastPathComponent()
+            appState.selectedSourceID = "local"
+            appState.isSingleFileMode = false
+            appState.loadDirectory(parentDir)
+
+            // Auto-select the first dropped file
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                if let node = appState.findNode(url: mdFiles[0], in: appState.rootNode) {
+                    appState.selectedFile = node
+                }
+            }
         }
     }
 }

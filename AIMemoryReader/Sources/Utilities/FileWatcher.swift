@@ -23,10 +23,11 @@ final class FileWatcher: Sendable {
 
         guard let stream = FSEventStreamCreate(
             nil,
-            { _, _, _, eventPaths, _, _ in
-                let paths = Unmanaged<CFArray>.fromOpaque(eventPaths).takeUnretainedValue() as! [String]
-                let hasMDChange = paths.contains { $0.hasSuffix(".md") }
-                if hasMDChange {
+            { _, _, numEvents, eventPaths, eventFlags, _ in
+                // Notify on any change — file-level filtering (.md only) was too
+                // restrictive because directory-level events (create/delete) don't
+                // carry the child filename. We debounce on the receiving side.
+                if numEvents > 0 {
                     DispatchQueue.main.async {
                         NotificationCenter.default.post(name: .fileWatcherDidDetectChange, object: nil)
                     }

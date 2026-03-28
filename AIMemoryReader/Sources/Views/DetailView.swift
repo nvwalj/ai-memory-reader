@@ -185,6 +185,11 @@ struct MarkdownDetailView: View {
 
     // MARK: - Read View (existing)
 
+    /// The parent directory of the current file, used to resolve relative paths
+    private var fileBaseURL: URL {
+        fileNode.url.deletingLastPathComponent()
+    }
+
     private var readView: some View {
         HStack(spacing: 0) {
             // Main markdown content
@@ -195,6 +200,7 @@ struct MarkdownDetailView: View {
                             Markdown(section.content)
                                 .markdownTheme(.memoryReader)
                                 .markdownCodeSyntaxHighlighter(.splash)
+                                .markdownImageProvider(.localFile(basePath: fileBaseURL))
                                 .textSelection(.enabled)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                                 .padding(.horizontal, 24)
@@ -208,6 +214,9 @@ struct MarkdownDetailView: View {
                         }
                     }
                     .padding(.vertical, 16)
+                    .environment(\.openURL, OpenURLAction { url in
+                        return Self.handleLocalLink(url: url, baseURL: fileBaseURL)
+                    })
                 }
                 .onChange(of: scrollTarget) { _, newValue in
                     if let target = newValue {
@@ -295,6 +304,39 @@ struct MarkdownDetailView: View {
 
     func manualSave() {
         saveIfNeeded()
+    }
+
+    // MARK: - Link Handling
+
+    /// Handle links: open local file links with default app, web links in browser
+    static func handleLocalLink(url: URL, baseURL: URL) -> OpenURLAction.Result {
+        // Web links — let the system handle them
+        if url.scheme == "http" || url.scheme == "https" || url.scheme == "mailto" {
+            return .systemAction
+        }
+
+        // Resolve the local path
+        let resolvedURL: URL
+        if url.scheme == "file" {
+            resolvedURL = url
+        } else {
+            // Relative path or bare path
+            let path = url.absoluteString.removingPercentEncoding ?? url.absoluteString
+            if path.hasPrefix("/") {
+                resolvedURL = URL(fileURLWithPath: path)
+            } else {
+                resolvedURL = baseURL.appendingPathComponent(path)
+            }
+        }
+
+        // Open with default system app
+        let fileURL = resolvedURL.isFileURL ? resolvedURL : URL(fileURLWithPath: resolvedURL.path)
+        if FileManager.default.fileExists(atPath: fileURL.path(percentEncoded: false)) {
+            NSWorkspace.shared.open(fileURL)
+            return .handled
+        }
+
+        return .systemAction
     }
 
     // MARK: - Load File

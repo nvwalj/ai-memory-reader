@@ -20,6 +20,7 @@
 		3610DD533DD1708CB78407B1 /* FileNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69A5DB280F284C91A072EEE5 /* FileNode.swift */; };
 		39977EE8A518E69D07D1DEC1 /* MarkdownUI in Frameworks */ = {isa = PBXBuildFile; productRef = 419CC2A2F23BBC2AF3023A3B /* MarkdownUI */; };
 		5577F1F0DCAAF2A6FCDB1A19 /* FileWatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3691D6A45320F43D34E2C579 /* FileWatcher.swift */; };
+		5860A7109155001FDF447645 /* LocalImageProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = B81FECF3C3942B02BB205C7D /* LocalImageProvider.swift */; };
 		594B59BB2B6939A6C68A1006 /* FileTreeBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56977F2BE26D6F308F1E0561 /* FileTreeBuilder.swift */; };
 		6662D7205DF6EEDAC90340FE /* SidebarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2E2093FAF79897629526F38 /* SidebarView.swift */; };
 		71C927BDD26E51418E235F2C /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D248BF40C03D9E2AD6716440 /* ContentView.swift */; };
@@ -41,6 +42,7 @@
 		E8E865A4FEFAD3837E570712 /* MarkdownUI in Frameworks */ = {isa = PBXBuildFile; productRef = 8F4B2988D9518EB8761E76F4 /* MarkdownUI */; };
 		F04D3D302CCA18B53CC846AF /* AIMemoryReaderApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9E527E4F068643568803A9B /* AIMemoryReaderApp.swift */; };
 		FB44D88E33A5A17CEE6A2E66 /* MemoryReaderTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 270478B19FE1C33296A3B0DF /* MemoryReaderTheme.swift */; };
+		FF94C8AB7C7AE2ED06DDDE87 /* LocalImageProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = B81FECF3C3942B02BB205C7D /* LocalImageProvider.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -56,6 +58,7 @@
 		90E04F0B21D75210E98CD430 /* SplashCodeSyntaxHighlighter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashCodeSyntaxHighlighter.swift; sourceTree = "<group>"; };
 		A2E2093FAF79897629526F38 /* SidebarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarView.swift; sourceTree = "<group>"; };
 		B4C4724134228F395760B42F /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+		B81FECF3C3942B02BB205C7D /* LocalImageProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalImageProvider.swift; sourceTree = "<group>"; };
 		CC4D982B38F9CE8F970D4A89 /* TOCView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TOCView.swift; sourceTree = "<group>"; };
 		D248BF40C03D9E2AD6716440 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		D4425392FF610C06C61FA3E1 /* AISource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AISource.swift; sourceTree = "<group>"; };
@@ -131,6 +134,7 @@
 			children = (
 				56977F2BE26D6F308F1E0561 /* FileTreeBuilder.swift */,
 				3691D6A45320F43D34E2C579 /* FileWatcher.swift */,
+				B81FECF3C3942B02BB205C7D /* LocalImageProvider.swift */,
 				270478B19FE1C33296A3B0DF /* MemoryReaderTheme.swift */,
 				725ECD196723FE272CE3ACAB /* SearchService.swift */,
 				90E04F0B21D75210E98CD430 /* SplashCodeSyntaxHighlighter.swift */,
@@ -279,6 +283,7 @@
 				3610DD533DD1708CB78407B1 /* FileNode.swift in Sources */,
 				594B59BB2B6939A6C68A1006 /* FileTreeBuilder.swift in Sources */,
 				5577F1F0DCAAF2A6FCDB1A19 /* FileWatcher.swift in Sources */,
+				5860A7109155001FDF447645 /* LocalImageProvider.swift in Sources */,
 				23D6FAB388A84C8E848E3B3C /* MarkdownEditorView.swift in Sources */,
 				932B3FB0759D7EDF1E1DDD04 /* MemoryReaderTheme.swift in Sources */,
 				0C9B5A6F2652D9D5E9D78635 /* SearchService.swift in Sources */,
@@ -300,6 +305,7 @@
 				7E9B1283C609667FCB07BD81 /* FileNode.swift in Sources */,
 				CD72E672CA6FDDF4A87E1929 /* FileTreeBuilder.swift in Sources */,
 				74FE15970F25505B49A3134F /* FileWatcher.swift in Sources */,
+				FF94C8AB7C7AE2ED06DDDE87 /* LocalImageProvider.swift in Sources */,
 				98E934B7CEBE3A67E11286D5 /* MarkdownEditorView.swift in Sources */,
 				FB44D88E33A5A17CEE6A2E66 /* MemoryReaderTheme.swift in Sources */,
 				DC3A48C8CD5F63E276ADADEC /* SearchService.swift in Sources */,

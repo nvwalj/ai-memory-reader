@@ -32,6 +32,7 @@ final class AppState {
     #if os(macOS)
     private var activeStream: FSEventStreamRef?
     private var fsObserver: Any?
+    private var debounceTask: Task<Void, Never>?
     #endif
 
     /// Incremented on each file-system change so views can react
@@ -298,7 +299,13 @@ final class AppState {
             queue: .main
         ) { [weak self] _ in
             Task { @MainActor in
-                self?.handleFileSystemChange()
+                // Debounce rapid FSEvents — wait 0.5s of quiet before rebuilding
+                self?.debounceTask?.cancel()
+                self?.debounceTask = Task { @MainActor in
+                    try? await Task.sleep(for: .milliseconds(500))
+                    guard !Task.isCancelled else { return }
+                    self?.handleFileSystemChange()
+                }
             }
         }
         #endif

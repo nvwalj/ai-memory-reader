@@ -67,3 +67,12 @@
   - 配置好 signing 后添加 CODE_SIGN_ENTITLEMENTS 即可
 - Sendable 安全：SettingsStore 标记为 @unchecked Sendable
 - macOS build 验证通过
+
+### 2026-03-27 — V3.3 iPhone Verification ✅
+- iOS Simulator build (iphonesimulator arm64) 编译通过，零错误
+- iPhone 16e 模拟器上安装并启动成功
+- 空状态 UI 显示正常：大标题、空状态提示、文件夹按钮都正确布局
+- 无编译错误，无明显布局问题
+- SettingsStore、PDFExporter 的 #if os(macOS) 正确隔离，iOS 端无影响
+
+### V3 完成 🎉

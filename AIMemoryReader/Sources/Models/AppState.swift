@@ -311,6 +311,28 @@ final class AppState {
     }
 
     #if os(macOS)
+    private func collectExpandedPaths(_ node: FileNode?) -> Set<String> {
+        guard let node else { return [] }
+        var paths = Set<String>()
+        if node.isDirectory && node.isExpanded {
+            paths.insert(node.id)
+        }
+        for child in node.children ?? [] {
+            paths.formUnion(collectExpandedPaths(child))
+        }
+        return paths
+    }
+
+    private func restoreExpandedPaths(_ paths: Set<String>, in node: FileNode?) {
+        guard let node else { return }
+        if node.isDirectory && paths.contains(node.id) {
+            node.isExpanded = true
+        }
+        for child in node.children ?? [] {
+            restoreExpandedPaths(paths, in: child)
+        }
+    }
+
     private func handleFileSystemChange() {
         print("[AppState] handleFileSystemChange triggered")
         guard let rootURL else {
@@ -318,17 +340,20 @@ final class AppState {
             return
         }
 
-        // Remember current selection
+        // Remember current state
         let previousSelectedURL = selectedFile?.url
+        let expandedPaths = collectExpandedPaths(rootNode)
 
         // Rebuild file tree
         rootNode = FileTreeBuilder.buildTree(at: rootURL)
         rootNode?.isExpanded = true
 
-        // Try to restore selection
+        // Restore expanded directories
+        restoreExpandedPaths(expandedPaths, in: rootNode)
+
+        // Restore selection
         if let prevURL = previousSelectedURL,
            let node = findNode(url: prevURL, in: rootNode) {
-            expandPathTo(node: node)
             selectedFile = node
         }
 

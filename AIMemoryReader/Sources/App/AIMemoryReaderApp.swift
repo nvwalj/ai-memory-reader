@@ -3,20 +3,71 @@ import SwiftUI
 extension Notification.Name {
     static let editorManualSave = Notification.Name("editorManualSave")
     static let exportPDF = Notification.Name("exportPDF")
+    static let openFileFromSystem = Notification.Name("openFileFromSystem")
 }
+
+#if os(macOS)
+@MainActor
+class AppDelegate: NSObject, NSApplicationDelegate {
+    /// Hold URLs that arrive before SwiftUI view is mounted (cold start)
+    static var pendingFileURLs: [URL] = []
+    private static var viewReady = false
+
+    static func markViewReady() {
+        viewReady = true
+        // Flush any URLs that arrived before the view was ready
+        for url in pendingFileURLs {
+            NotificationCenter.default.post(name: .openFileFromSystem, object: url)
+        }
+        pendingFileURLs.removeAll()
+    }
+
+    func application(_ application: NSApplication, open urls: [URL]) {
+        for url in urls where url.isFileURL {
+            if AppDelegate.viewReady {
+                NotificationCenter.default.post(name: .openFileFromSystem, object: url)
+            } else {
+                AppDelegate.pendingFileURLs.append(url)
+            }
+        }
+    }
+}
+#endif
 
 @main
 struct AIMemoryReaderApp: App {
     @State private var appState = AppState()
+
+    #if os(macOS)
+    @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+    #endif
 
     var body: some Scene {
         WindowGroup {
             ContentView()
                 .environment(appState)
                 .onOpenURL { url in
-                    appState.handleURL(url)
+                    if url.isFileURL {
+                        appState.openSingleFile(url)
+                    } else {
+                        appState.handleURL(url)
+                    }
                 }
+                #if os(macOS)
+                .handlesExternalEvents(preferring: ["*"], allowing: ["*"])
+                .onReceive(NotificationCenter.default.publisher(for: .openFileFromSystem)) { notification in
+                    if let fileURL = notification.object as? URL {
+                        appState.openSingleFile(fileURL)
+                    }
+                }
+                .onAppear {
+                    AppDelegate.markViewReady()
+                }
+                #endif
         }
+        #if os(macOS)
+        .handlesExternalEvents(matching: ["*"])
+        #endif
         #if os(macOS)
         .commands {
             CommandGroup(replacing: .newItem) {

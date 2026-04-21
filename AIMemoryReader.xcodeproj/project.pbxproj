@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		0358C8314653253BB8569D5D /* DetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6610F936A4333D1A7A53874 /* DetailView.swift */; };
+		0412E70A04238B78C57F53DD /* FileFindBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C1834B91E2D2A49B4869C5D /* FileFindBar.swift */; };
 		06246CD688EF3373DF41A4A2 /* AIMemoryReaderApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9E527E4F068643568803A9B /* AIMemoryReaderApp.swift */; };
 		0C9B5A6F2652D9D5E9D78635 /* SearchService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 725ECD196723FE272CE3ACAB /* SearchService.swift */; };
 		0D70AA0F2056620F8D9A82E0 /* Splash in Frameworks */ = {isa = PBXBuildFile; productRef = 1FA6D624BEBD4A25A4F01FB8 /* Splash */; };
@@ -20,28 +21,33 @@
 		3610DD533DD1708CB78407B1 /* FileNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69A5DB280F284C91A072EEE5 /* FileNode.swift */; };
 		39977EE8A518E69D07D1DEC1 /* MarkdownUI in Frameworks */ = {isa = PBXBuildFile; productRef = 419CC2A2F23BBC2AF3023A3B /* MarkdownUI */; };
 		5577F1F0DCAAF2A6FCDB1A19 /* FileWatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3691D6A45320F43D34E2C579 /* FileWatcher.swift */; };
+		56D534C3E188054D3E4EECDC /* AppTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF0797206C2BDF2BDE55F9E3 /* AppTheme.swift */; };
+		573E91FDC87334D159FFBC24 /* SettingsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B635EFC7C7D6A7FF5AC96A91 /* SettingsStore.swift */; };
 		5860A7109155001FDF447645 /* LocalImageProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = B81FECF3C3942B02BB205C7D /* LocalImageProvider.swift */; };
 		594B59BB2B6939A6C68A1006 /* FileTreeBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56977F2BE26D6F308F1E0561 /* FileTreeBuilder.swift */; };
+		5EC4B21877DEC1C255B62908 /* PDFExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2DA8DFEFD0D88FA6D07CD6A /* PDFExporter.swift */; };
 		6662D7205DF6EEDAC90340FE /* SidebarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2E2093FAF79897629526F38 /* SidebarView.swift */; };
 		71C927BDD26E51418E235F2C /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D248BF40C03D9E2AD6716440 /* ContentView.swift */; };
+		7319EF8C346E3286470D6D23 /* WindowChrome.swift in Sources */ = {isa = PBXBuildFile; fileRef = 752B3360ECF746FAD8CB3AE3 /* WindowChrome.swift */; };
 		74FE15970F25505B49A3134F /* FileWatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3691D6A45320F43D34E2C579 /* FileWatcher.swift */; };
 		78DB864F59FC089B517B6181 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D248BF40C03D9E2AD6716440 /* ContentView.swift */; };
+		7A3A6ED902E8392305541029 /* WindowChrome.swift in Sources */ = {isa = PBXBuildFile; fileRef = 752B3360ECF746FAD8CB3AE3 /* WindowChrome.swift */; };
 		7E9B1283C609667FCB07BD81 /* FileNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69A5DB280F284C91A072EEE5 /* FileNode.swift */; };
 		81AC655F47D2ECC9AB0E3F6D /* TOCView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC4D982B38F9CE8F970D4A89 /* TOCView.swift */; };
 		8C9E8D4A9F4666EDF756DF2C /* AISource.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4425392FF610C06C61FA3E1 /* AISource.swift */; };
 		932B3FB0759D7EDF1E1DDD04 /* MemoryReaderTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 270478B19FE1C33296A3B0DF /* MemoryReaderTheme.swift */; };
 		98E934B7CEBE3A67E11286D5 /* MarkdownEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17E3A71310F272AA72203D67 /* MarkdownEditorView.swift */; };
-		A1B2C3D4E5F60718A9B0C1D2 /* PDFExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1E2D3C4B5A60718F9E0D1C2 /* PDFExporter.swift */; };
 		AC43341EE831FBC929DC4B84 /* SplashCodeSyntaxHighlighter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90E04F0B21D75210E98CD430 /* SplashCodeSyntaxHighlighter.swift */; };
 		AEFCB90BC321F3ED5BC55CBD /* AISource.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4425392FF610C06C61FA3E1 /* AISource.swift */; };
-		B2C3D4E5F6A70829B0C1D2E3 /* PDFExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1E2D3C4B5A60718F9E0D1C2 /* PDFExporter.swift */; };
 		C19044D545DB7890ADC40746 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4C4724134228F395760B42F /* AppState.swift */; };
 		C357559BA260869B761012D0 /* SplashCodeSyntaxHighlighter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90E04F0B21D75210E98CD430 /* SplashCodeSyntaxHighlighter.swift */; };
-		C3D4E5F6A7B80930C1D2E3F4 /* SettingsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2F3A4B5C6D70819E0F1A2B3 /* SettingsStore.swift */; };
+		CA3FEF32EB9EB6006B3E9AC5 /* PDFExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2DA8DFEFD0D88FA6D07CD6A /* PDFExporter.swift */; };
 		CD72E672CA6FDDF4A87E1929 /* FileTreeBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56977F2BE26D6F308F1E0561 /* FileTreeBuilder.swift */; };
+		CED5A357C06C0F512AB2122B /* AppTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF0797206C2BDF2BDE55F9E3 /* AppTheme.swift */; };
+		D2780069BABD3B8061774885 /* SettingsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B635EFC7C7D6A7FF5AC96A91 /* SettingsStore.swift */; };
 		D2A5E8043CB302F66AB229CA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 00226A340EC4A00FAB66CD45 /* Assets.xcassets */; };
-		D4E5F6A7B8C91041D2E3F4A5 /* SettingsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2F3A4B5C6D70819E0F1A2B3 /* SettingsStore.swift */; };
 		DC3A48C8CD5F63E276ADADEC /* SearchService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 725ECD196723FE272CE3ACAB /* SearchService.swift */; };
+		DDA28F618448684A107CC0A9 /* FileFindBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C1834B91E2D2A49B4869C5D /* FileFindBar.swift */; };
 		DF8C39DB565A50C76D3E6BC9 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4C4724134228F395760B42F /* AppState.swift */; };
 		E8E865A4FEFAD3837E570712 /* MarkdownUI in Frameworks */ = {isa = PBXBuildFile; productRef = 8F4B2988D9518EB8761E76F4 /* MarkdownUI */; };
 		F04D3D302CCA18B53CC846AF /* AIMemoryReaderApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9E527E4F068643568803A9B /* AIMemoryReaderApp.swift */; };
@@ -51,27 +57,30 @@
 
 /* Begin PBXFileReference section */
 		00226A340EC4A00FAB66CD45 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		15E0AAABE2B7C11EBF913428 /* AIMemoryReader.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = AIMemoryReader.entitlements; sourceTree = "<group>"; };
 		17E3A71310F272AA72203D67 /* MarkdownEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownEditorView.swift; sourceTree = "<group>"; };
 		21AAE6595CCD0FCB2E30E16A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		270478B19FE1C33296A3B0DF /* MemoryReaderTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoryReaderTheme.swift; sourceTree = "<group>"; };
-		27E5C1FBAF93AAB3152C77DB /* AI Memory Reader.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "AI Memory Reader.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		27E5C1FBAF93AAB3152C77DB /* AIMemoryReader-iOS.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = "AIMemoryReader-iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3691D6A45320F43D34E2C579 /* FileWatcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileWatcher.swift; sourceTree = "<group>"; };
-		3D40D2892F7CB2C900816C8B /* AIMemoryReader.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = AIMemoryReader.entitlements; path = AIMemoryReader/AIMemoryReader.entitlements; sourceTree = "<group>"; };
-		3D40D28A2F7CB2E500816C8B /* AIMemoryReader-iOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "AIMemoryReader-iOS.entitlements"; sourceTree = "<group>"; };
+		3C1834B91E2D2A49B4869C5D /* FileFindBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileFindBar.swift; sourceTree = "<group>"; };
 		56977F2BE26D6F308F1E0561 /* FileTreeBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileTreeBuilder.swift; sourceTree = "<group>"; };
 		69A5DB280F284C91A072EEE5 /* FileNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileNode.swift; sourceTree = "<group>"; };
 		725ECD196723FE272CE3ACAB /* SearchService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchService.swift; sourceTree = "<group>"; };
+		752B3360ECF746FAD8CB3AE3 /* WindowChrome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowChrome.swift; sourceTree = "<group>"; };
 		90E04F0B21D75210E98CD430 /* SplashCodeSyntaxHighlighter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashCodeSyntaxHighlighter.swift; sourceTree = "<group>"; };
 		A2E2093FAF79897629526F38 /* SidebarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarView.swift; sourceTree = "<group>"; };
 		B4C4724134228F395760B42F /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+		B635EFC7C7D6A7FF5AC96A91 /* SettingsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsStore.swift; sourceTree = "<group>"; };
 		B81FECF3C3942B02BB205C7D /* LocalImageProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalImageProvider.swift; sourceTree = "<group>"; };
+		BBF2FBB31FC98CA0914617C9 /* AIMemoryReader-iOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "AIMemoryReader-iOS.entitlements"; sourceTree = "<group>"; };
 		CC4D982B38F9CE8F970D4A89 /* TOCView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TOCView.swift; sourceTree = "<group>"; };
 		D248BF40C03D9E2AD6716440 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		D4425392FF610C06C61FA3E1 /* AISource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AISource.swift; sourceTree = "<group>"; };
 		D6610F936A4333D1A7A53874 /* DetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailView.swift; sourceTree = "<group>"; };
-		E2F3A4B5C6D70819E0F1A2B3 /* SettingsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsStore.swift; sourceTree = "<group>"; };
-		F0E49EB34CA6DA4182328E8D /* AI Memory Reader.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "AI Memory Reader.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		F1E2D3C4B5A60718F9E0D1C2 /* PDFExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFExporter.swift; sourceTree = "<group>"; };
+		DF0797206C2BDF2BDE55F9E3 /* AppTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTheme.swift; sourceTree = "<group>"; };
+		F0E49EB34CA6DA4182328E8D /* AIMemoryReader.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AIMemoryReader.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		F2DA8DFEFD0D88FA6D07CD6A /* PDFExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFExporter.swift; sourceTree = "<group>"; };
 		F9E527E4F068643568803A9B /* AIMemoryReaderApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIMemoryReaderApp.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -102,8 +111,9 @@
 			children = (
 				D4425392FF610C06C61FA3E1 /* AISource.swift */,
 				B4C4724134228F395760B42F /* AppState.swift */,
+				DF0797206C2BDF2BDE55F9E3 /* AppTheme.swift */,
 				69A5DB280F284C91A072EEE5 /* FileNode.swift */,
-				E2F3A4B5C6D70819E0F1A2B3 /* SettingsStore.swift */,
+				B635EFC7C7D6A7FF5AC96A91 /* SettingsStore.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -111,8 +121,8 @@
 		32894954F04264D8F7DBB57B /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				27E5C1FBAF93AAB3152C77DB /* AI Memory Reader.app */,
-				F0E49EB34CA6DA4182328E8D /* AI Memory Reader.app */,
+				27E5C1FBAF93AAB3152C77DB /* AIMemoryReader-iOS.app */,
+				F0E49EB34CA6DA4182328E8D /* AIMemoryReader.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -145,9 +155,10 @@
 				3691D6A45320F43D34E2C579 /* FileWatcher.swift */,
 				B81FECF3C3942B02BB205C7D /* LocalImageProvider.swift */,
 				270478B19FE1C33296A3B0DF /* MemoryReaderTheme.swift */,
-				F1E2D3C4B5A60718F9E0D1C2 /* PDFExporter.swift */,
+				F2DA8DFEFD0D88FA6D07CD6A /* PDFExporter.swift */,
 				725ECD196723FE272CE3ACAB /* SearchService.swift */,
 				90E04F0B21D75210E98CD430 /* SplashCodeSyntaxHighlighter.swift */,
+				752B3360ECF746FAD8CB3AE3 /* WindowChrome.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -157,6 +168,7 @@
 			children = (
 				D248BF40C03D9E2AD6716440 /* ContentView.swift */,
 				D6610F936A4333D1A7A53874 /* DetailView.swift */,
+				3C1834B91E2D2A49B4869C5D /* FileFindBar.swift */,
 				17E3A71310F272AA72203D67 /* MarkdownEditorView.swift */,
 				A2E2093FAF79897629526F38 /* SidebarView.swift */,
 				CC4D982B38F9CE8F970D4A89 /* TOCView.swift */,
@@ -167,8 +179,6 @@
 		D6DEF109ED6829B540040863 = {
 			isa = PBXGroup;
 			children = (
-				3D40D28A2F7CB2E500816C8B /* AIMemoryReader-iOS.entitlements */,
-				3D40D2892F7CB2C900816C8B /* AIMemoryReader.entitlements */,
 				9C28896FB40753A7FD182107 /* Sources */,
 				32894954F04264D8F7DBB57B /* Products */,
 			);
@@ -177,6 +187,8 @@
 		FA4EBB375A22D3B749841507 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				BBF2FBB31FC98CA0914617C9 /* AIMemoryReader-iOS.entitlements */,
+				15E0AAABE2B7C11EBF913428 /* AIMemoryReader.entitlements */,
 				00226A340EC4A00FAB66CD45 /* Assets.xcassets */,
 				21AAE6595CCD0FCB2E30E16A /* Info.plist */,
 			);
@@ -204,7 +216,7 @@
 				1FA6D624BEBD4A25A4F01FB8 /* Splash */,
 			);
 			productName = AIMemoryReader;
-			productReference = F0E49EB34CA6DA4182328E8D /* AI Memory Reader.app */;
+			productReference = F0E49EB34CA6DA4182328E8D /* AIMemoryReader.app */;
 			productType = "com.apple.product-type.application";
 		};
 		EE733643EEF8BA0E1E17DBAE /* AIMemoryReader-iOS */ = {
@@ -225,7 +237,7 @@
 				A358A8DC5D7E7FF5756290BB /* Splash */,
 			);
 			productName = "AIMemoryReader-iOS";
-			productReference = 27E5C1FBAF93AAB3152C77DB /* AI Memory Reader.app */;
+			productReference = 27E5C1FBAF93AAB3152C77DB /* AIMemoryReader-iOS.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -236,6 +248,8 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+				};
 			};
 			buildConfigurationList = D63519C8BBEB724D82C279A0 /* Build configuration list for PBXProject "AIMemoryReader" */;
 			developmentRegion = en;
@@ -288,20 +302,23 @@
 				06246CD688EF3373DF41A4A2 /* AIMemoryReaderApp.swift in Sources */,
 				8C9E8D4A9F4666EDF756DF2C /* AISource.swift in Sources */,
 				DF8C39DB565A50C76D3E6BC9 /* AppState.swift in Sources */,
+				CED5A357C06C0F512AB2122B /* AppTheme.swift in Sources */,
 				78DB864F59FC089B517B6181 /* ContentView.swift in Sources */,
 				2D517B974CE300D8DBD01C37 /* DetailView.swift in Sources */,
+				DDA28F618448684A107CC0A9 /* FileFindBar.swift in Sources */,
 				3610DD533DD1708CB78407B1 /* FileNode.swift in Sources */,
 				594B59BB2B6939A6C68A1006 /* FileTreeBuilder.swift in Sources */,
 				5577F1F0DCAAF2A6FCDB1A19 /* FileWatcher.swift in Sources */,
 				5860A7109155001FDF447645 /* LocalImageProvider.swift in Sources */,
 				23D6FAB388A84C8E848E3B3C /* MarkdownEditorView.swift in Sources */,
 				932B3FB0759D7EDF1E1DDD04 /* MemoryReaderTheme.swift in Sources */,
-				A1B2C3D4E5F60718A9B0C1D2 /* PDFExporter.swift in Sources */,
+				CA3FEF32EB9EB6006B3E9AC5 /* PDFExporter.swift in Sources */,
 				0C9B5A6F2652D9D5E9D78635 /* SearchService.swift in Sources */,
-				C3D4E5F6A7B80930C1D2E3F4 /* SettingsStore.swift in Sources */,
+				573E91FDC87334D159FFBC24 /* SettingsStore.swift in Sources */,
 				2BC2EE02A0010186D60F2370 /* SidebarView.swift in Sources */,
 				AC43341EE831FBC929DC4B84 /* SplashCodeSyntaxHighlighter.swift in Sources */,
 				2F37BCE3726AA04649D72527 /* TOCView.swift in Sources */,
+				7A3A6ED902E8392305541029 /* WindowChrome.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -312,20 +329,23 @@
 				F04D3D302CCA18B53CC846AF /* AIMemoryReaderApp.swift in Sources */,
 				AEFCB90BC321F3ED5BC55CBD /* AISource.swift in Sources */,
 				C19044D545DB7890ADC40746 /* AppState.swift in Sources */,
+				56D534C3E188054D3E4EECDC /* AppTheme.swift in Sources */,
 				71C927BDD26E51418E235F2C /* ContentView.swift in Sources */,
 				0358C8314653253BB8569D5D /* DetailView.swift in Sources */,
+				0412E70A04238B78C57F53DD /* FileFindBar.swift in Sources */,
 				7E9B1283C609667FCB07BD81 /* FileNode.swift in Sources */,
 				CD72E672CA6FDDF4A87E1929 /* FileTreeBuilder.swift in Sources */,
 				74FE15970F25505B49A3134F /* FileWatcher.swift in Sources */,
 				FF94C8AB7C7AE2ED06DDDE87 /* LocalImageProvider.swift in Sources */,
 				98E934B7CEBE3A67E11286D5 /* MarkdownEditorView.swift in Sources */,
 				FB44D88E33A5A17CEE6A2E66 /* MemoryReaderTheme.swift in Sources */,
-				B2C3D4E5F6A70829B0C1D2E3 /* PDFExporter.swift in Sources */,
+				5EC4B21877DEC1C255B62908 /* PDFExporter.swift in Sources */,
 				DC3A48C8CD5F63E276ADADEC /* SearchService.swift in Sources */,
-				D4E5F6A7B8C91041D2E3F4A5 /* SettingsStore.swift in Sources */,
+				D2780069BABD3B8061774885 /* SettingsStore.swift in Sources */,
 				6662D7205DF6EEDAC90340FE /* SidebarView.swift in Sources */,
 				C357559BA260869B761012D0 /* SplashCodeSyntaxHighlighter.swift in Sources */,
 				81AC655F47D2ECC9AB0E3F6D /* TOCView.swift in Sources */,
+				7319EF8C346E3286470D6D23 /* WindowChrome.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -336,13 +356,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = AIMemoryReader/AIMemoryReader.entitlements;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = LFUDWMQGY3;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AIMemoryReader/Sources/Resources/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "AI Memory Reader";
@@ -351,10 +366,9 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.2.0;
+				MARKETING_VERSION = 0.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.aitools.ai-memory-reader";
 				PRODUCT_NAME = "AI Memory Reader";
-				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = macosx;
 				SWIFT_STRICT_CONCURRENCY = complete;
 			};
@@ -364,10 +378,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = "AIMemoryReader-iOS.entitlements";
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = LFUDWMQGY3;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AIMemoryReader/Sources/Resources/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "AI Memory Reader";
@@ -378,7 +390,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.2.0;
+				MARKETING_VERSION = 0.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.aitools.ai-memory-reader-ios";
 				PRODUCT_NAME = "AI Memory Reader";
 				SDKROOT = iphoneos;
@@ -511,10 +523,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = "AIMemoryReader-iOS.entitlements";
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = LFUDWMQGY3;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AIMemoryReader/Sources/Resources/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "AI Memory Reader";
@@ -525,7 +535,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.2.0;
+				MARKETING_VERSION = 0.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.aitools.ai-memory-reader-ios";
 				PRODUCT_NAME = "AI Memory Reader";
 				SDKROOT = iphoneos;
@@ -539,13 +549,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = AIMemoryReader/AIMemoryReader.entitlements;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = LFUDWMQGY3;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AIMemoryReader/Sources/Resources/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "AI Memory Reader";
@@ -554,10 +559,9 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.2.0;
+				MARKETING_VERSION = 0.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.aitools.ai-memory-reader";
 				PRODUCT_NAME = "AI Memory Reader";
-				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = macosx;
 				SWIFT_STRICT_CONCURRENCY = complete;
 			};

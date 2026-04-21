@@ -62,6 +62,10 @@ struct AIMemoryReaderApp: App {
                 }
                 .onAppear {
                     AppDelegate.markViewReady()
+                    WindowChrome.apply(for: appState.appTheme)
+                }
+                .onChange(of: appState.appTheme) { _, newTheme in
+                    WindowChrome.apply(for: newTheme)
                 }
                 #endif
         }
@@ -78,10 +82,28 @@ struct AIMemoryReaderApp: App {
             }
 
             CommandGroup(after: .textEditing) {
-                Button("Find…") {
-                    appState.focusSearch = true
+                Button("Find in File…") {
+                    // When a file is loaded, ask DetailView to open its in-page find bar.
+                    // Otherwise, focus the sidebar search box.
+                    if let file = appState.selectedFile, !file.isDirectory {
+                        appState.requestFindInFile()
+                    } else {
+                        appState.focusSearch = true
+                    }
                 }
                 .keyboardShortcut("f", modifiers: .command)
+
+                Button("Search Files…") {
+                    appState.focusSearch = true
+                }
+                .keyboardShortcut("f", modifiers: [.command, .shift])
+            }
+
+            CommandGroup(after: .toolbar) {
+                Button(appState.appTheme == .eyeCare ? "Turn Off Eye Care" : "Turn On Eye Care") {
+                    appState.toggleAppTheme()
+                }
+                .keyboardShortcut("y", modifiers: [.command, .shift])
             }
 
             CommandGroup(replacing: .saveItem) {

@@ -28,6 +28,20 @@ final class AppState {
     var isSearching: Bool = false
     var focusSearch: Bool = false
 
+    // MARK: - Appearance
+
+    var appTheme: AppTheme = .standard {
+        didSet {
+            SettingsStore.shared.appThemeRaw = appTheme.rawValue
+        }
+    }
+
+    // MARK: - In-page Find
+
+    /// Pulsed to request the Detail view open its find-in-file bar.
+    /// DetailView observes and becomes active when a file is loaded.
+    var findInFileToken: Int = 0
+
     // MARK: - File Watching
 
     #if os(macOS)
@@ -54,6 +68,20 @@ final class AppState {
     init() {
         availableSources = AISource.detectAllAvailable()
         selectedSourceID = SettingsStore.shared.lastSelectedSourceID
+        if let raw = SettingsStore.shared.appThemeRaw,
+           let saved = AppTheme(rawValue: raw) {
+            appTheme = saved
+        }
+    }
+
+    /// Cycle between Standard and Eye-Care.
+    func toggleAppTheme() {
+        appTheme = (appTheme == .standard) ? .eyeCare : .standard
+    }
+
+    /// Ask DetailView to open the find-in-file bar.
+    func requestFindInFile() {
+        findInFileToken &+= 1
     }
 
     /// Refresh the available sources list (after adding/removing custom sources)

@@ -16,6 +16,7 @@ final class SettingsStore: @unchecked Sendable {
         static let customAISourcePaths = "customAISourcePaths"
         static let lastSelectedSourceID = "lastSelectedSourceID"
         static let lastLocalFolderPath = "lastLocalFolderPath"
+        static let appTheme = "appTheme"
     }
 
     private init() {
@@ -54,6 +55,11 @@ final class SettingsStore: @unchecked Sendable {
     var lastLocalFolderPath: String? {
         get { string(forKey: Key.lastLocalFolderPath) }
         set { set(newValue, forKey: Key.lastLocalFolderPath) }
+    }
+
+    var appThemeRaw: String? {
+        get { string(forKey: Key.appTheme) }
+        set { set(newValue, forKey: Key.appTheme) }
     }
 
     // MARK: - Private read/write helpers
@@ -117,6 +123,7 @@ final class SettingsStore: @unchecked Sendable {
             Key.customAISourcePaths,
             Key.lastSelectedSourceID,
             Key.lastLocalFolderPath,
+            Key.appTheme,
         ]
 
         for key in keysToMigrate {

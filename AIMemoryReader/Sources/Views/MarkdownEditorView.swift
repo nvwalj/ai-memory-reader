@@ -2,6 +2,10 @@
 import AppKit
 import SwiftUI
 
+extension Notification.Name {
+    static let editorShowFindBar = Notification.Name("editorShowFindBar")
+}
+
 // MARK: - Markdown Editor View (NSTextView wrapper with syntax highlighting)
 
 struct MarkdownEditorView: NSViewRepresentable {
@@ -31,7 +35,7 @@ struct MarkdownEditorView: NSViewRepresentable {
         textView.isSelectable = true
         textView.allowsUndo = true
         textView.isRichText = false
-        textView.usesFindPanel = true
+        textView.usesFindBar = true
         textView.isAutomaticQuoteSubstitutionEnabled = false
         textView.isAutomaticDashSubstitutionEnabled = false
         textView.isAutomaticTextReplacementEnabled = false
@@ -84,9 +88,35 @@ struct MarkdownEditorView: NSViewRepresentable {
         var parent: MarkdownEditorView
         weak var textView: HighlightingTextView?
         private var isUpdating = false
+        private var findObserver: NSObjectProtocol?
 
         init(_ parent: MarkdownEditorView) {
             self.parent = parent
+            super.init()
+            findObserver = NotificationCenter.default.addObserver(
+                forName: .editorShowFindBar,
+                object: nil,
+                queue: .main
+            ) { [weak self] _ in
+                MainActor.assumeIsolated {
+                    self?.showFindBar()
+                }
+            }
+        }
+
+        deinit {
+            if let obs = findObserver {
+                NotificationCenter.default.removeObserver(obs)
+            }
+        }
+
+        @MainActor
+        private func showFindBar() {
+            guard let textView else { return }
+            let item = NSMenuItem()
+            item.tag = NSTextFinder.Action.showFindInterface.rawValue
+            textView.window?.makeFirstResponder(textView)
+            textView.performTextFinderAction(item)
         }
 
         func textDidChange(_ notification: Notification) {

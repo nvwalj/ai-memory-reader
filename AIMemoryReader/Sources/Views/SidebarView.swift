@@ -16,7 +16,12 @@ extension View {
 
 struct SidebarView: View {
     @Environment(AppState.self) private var appState
+    @Environment(\.colorScheme) private var colorScheme
     @FocusState private var isSearchFocused: Bool
+
+    private var palette: ThemePalette {
+        ThemePalette.resolve(appState.appTheme, colorScheme: colorScheme)
+    }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -42,6 +47,7 @@ struct SidebarView: View {
                     }
                 }
                 .listStyle(.sidebar)
+                .scrollContentBackground(palette.isEyeCare ? .hidden : .automatic)
                 .id(appState.fileChangeToken)
             } else {
                 emptyState
@@ -51,6 +57,8 @@ struct SidebarView: View {
             headerView
         }
         .frame(minWidth: 220)
+        .background(palette.isEyeCare ? AnyShapeStyle(palette.sidebarBackground) : AnyShapeStyle(Color.clear))
+        .environment(\.themePalette, palette)
         .onChange(of: appState.focusSearch) { _, newValue in
             if newValue {
                 isSearchFocused = true
@@ -60,14 +68,27 @@ struct SidebarView: View {
     }
 
     private var headerView: some View {
-        HStack {
+        HStack(spacing: 6) {
             Text("AI Memory Reader")
                 .font(.headline)
+                .foregroundColor(palette.isEyeCare ? palette.text : .primary)
             Spacer()
+            Button {
+                appState.toggleAppTheme()
+            } label: {
+                Image(systemName: appState.appTheme == .eyeCare ? "leaf.fill" : "leaf")
+                    .foregroundStyle(appState.appTheme == .eyeCare
+                                     ? Color.green
+                                     : (palette.isEyeCare ? palette.secondaryText : Color.secondary))
+            }
+            .buttonStyle(.plain)
+            .help(appState.appTheme == .eyeCare
+                  ? "Switch to Standard theme (⇧⌘Y)"
+                  : "Switch to Eye Care theme (⇧⌘Y)")
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 10)
-        .background(.bar)
+        .background(palette.isEyeCare ? AnyShapeStyle(palette.secondaryBackground) : AnyShapeStyle(.bar))
     }
 
     private var aiSourcesSection: some View {

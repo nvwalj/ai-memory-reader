@@ -40,164 +40,185 @@ private var headingScale: CGFloat {
 }
 
 extension MarkdownUI.Theme {
-    /// Custom theme optimized for reading AI memory files
-    @MainActor static let memoryReader = Theme()
-        // MARK: - Text
-        .text {
-            FontSize(baseFontSize)
-            ForegroundColor(.primary)
-        }
-        // MARK: - Headings
-        .heading1 { configuration in
-            configuration.label
-                .markdownMargin(top: 28, bottom: 16)
-                .markdownTextStyle {
-                    FontWeight(.bold)
-                    FontSize(32 * headingScale)
-                    ForegroundColor(.primary)
+    /// Default theme — uses system-semantic colors, follows light/dark.
+    @MainActor static let memoryReader = Theme.memoryReader(palette: .standardLight)
+
+    /// Build a theme tuned to a given palette. When `palette.isEyeCare` is true the
+    /// palette's explicit colors are applied; otherwise system-semantic colors are
+    /// preserved so appearance still follows the system.
+    @MainActor static func memoryReader(palette: ThemePalette) -> Theme {
+        let textColor: Color      = palette.isEyeCare ? palette.text         : .primary
+        let headingColor: Color   = palette.isEyeCare ? palette.heading      : .primary
+        let secondaryColor: Color = palette.isEyeCare ? palette.secondaryText : .secondary
+        let codeColor: Color      = palette.isEyeCare ? palette.code         : .pink
+        let codeBgColor: Color    = palette.isEyeCare
+            ? palette.codeBackground
+            : Color.platformControlBackground.opacity(0.6)
+        let linkColor: Color      = palette.isEyeCare ? palette.link         : .accentColor
+        let tableZebra: Color     = palette.isEyeCare
+            ? palette.secondaryBackground.opacity(0.4)
+            : Color.platformControlBackground.opacity(0.3)
+        let borderColor: Color    = palette.isEyeCare ? palette.divider : Color.platformSeparator
+        let accentColor: Color    = palette.isEyeCare ? palette.accent : .accentColor
+
+        return Theme()
+            // MARK: - Text
+            .text {
+                FontSize(baseFontSize)
+                ForegroundColor(textColor)
+            }
+            // MARK: - Headings
+            .heading1 { configuration in
+                configuration.label
+                    .markdownMargin(top: 28, bottom: 16)
+                    .markdownTextStyle {
+                        FontWeight(.bold)
+                        FontSize(32 * headingScale)
+                        ForegroundColor(headingColor)
+                    }
+            }
+            .heading2 { configuration in
+                configuration.label
+                    .markdownMargin(top: 24, bottom: 12)
+                    .markdownTextStyle {
+                        FontWeight(.bold)
+                        FontSize(26 * headingScale)
+                        ForegroundColor(headingColor)
+                    }
+            }
+            .heading3 { configuration in
+                configuration.label
+                    .markdownMargin(top: 20, bottom: 10)
+                    .markdownTextStyle {
+                        FontWeight(.semibold)
+                        FontSize(22 * headingScale)
+                        ForegroundColor(headingColor)
+                    }
+            }
+            .heading4 { configuration in
+                configuration.label
+                    .markdownMargin(top: 16, bottom: 8)
+                    .markdownTextStyle {
+                        FontWeight(.semibold)
+                        FontSize(18 * headingScale)
+                        ForegroundColor(headingColor)
+                    }
+            }
+            .heading5 { configuration in
+                configuration.label
+                    .markdownMargin(top: 14, bottom: 6)
+                    .markdownTextStyle {
+                        FontWeight(.medium)
+                        FontSize(16 * headingScale)
+                        ForegroundColor(headingColor)
+                    }
+            }
+            .heading6 { configuration in
+                configuration.label
+                    .markdownMargin(top: 12, bottom: 6)
+                    .markdownTextStyle {
+                        FontWeight(.medium)
+                        FontSize(14 * headingScale)
+                        ForegroundColor(secondaryColor)
+                    }
+            }
+            // MARK: - Code
+            .code {
+                FontFamilyVariant(.monospaced)
+                FontSize(14)
+                ForegroundColor(codeColor)
+                BackgroundColor(codeBgColor)
+            }
+            .codeBlock { configuration in
+                VStack(alignment: .leading, spacing: 0) {
+                    if let language = configuration.language, !language.isEmpty {
+                        Text(language.uppercased())
+                            .font(.system(size: 10, weight: .medium, design: .monospaced))
+                            .foregroundColor(secondaryColor)
+                            .padding(.horizontal, 12)
+                            .padding(.top, 8)
+                            .padding(.bottom, 4)
+                    }
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        configuration.label
+                            .markdownTextStyle {
+                                FontFamilyVariant(.monospaced)
+                                FontSize(14)
+                            }
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 8)
+                    }
                 }
-        }
-        .heading2 { configuration in
-            configuration.label
-                .markdownMargin(top: 24, bottom: 12)
-                .markdownTextStyle {
-                    FontWeight(.bold)
-                    FontSize(26 * headingScale)
-                    ForegroundColor(.primary)
-                }
-        }
-        .heading3 { configuration in
-            configuration.label
-                .markdownMargin(top: 20, bottom: 10)
-                .markdownTextStyle {
-                    FontWeight(.semibold)
-                    FontSize(22 * headingScale)
-                    ForegroundColor(.primary)
-                }
-        }
-        .heading4 { configuration in
-            configuration.label
-                .markdownMargin(top: 16, bottom: 8)
-                .markdownTextStyle {
-                    FontWeight(.semibold)
-                    FontSize(18 * headingScale)
-                    ForegroundColor(.primary)
-                }
-        }
-        .heading5 { configuration in
-            configuration.label
-                .markdownMargin(top: 14, bottom: 6)
-                .markdownTextStyle {
-                    FontWeight(.medium)
-                    FontSize(16 * headingScale)
-                    ForegroundColor(.primary)
-                }
-        }
-        .heading6 { configuration in
-            configuration.label
-                .markdownMargin(top: 12, bottom: 6)
-                .markdownTextStyle {
-                    FontWeight(.medium)
-                    FontSize(14 * headingScale)
-                    ForegroundColor(.secondary)
-                }
-        }
-        // MARK: - Code
-        .code {
-            FontFamilyVariant(.monospaced)
-            FontSize(14)
-            ForegroundColor(.pink)
-            BackgroundColor(Color.platformControlBackground.opacity(0.6))
-        }
-        .codeBlock { configuration in
-            VStack(alignment: .leading, spacing: 0) {
-                if let language = configuration.language, !language.isEmpty {
-                    Text(language.uppercased())
-                        .font(.system(size: 10, weight: .medium, design: .monospaced))
-                        .foregroundColor(.secondary)
-                        .padding(.horizontal, 12)
-                        .padding(.top, 8)
-                        .padding(.bottom, 4)
-                }
-                ScrollView(.horizontal, showsIndicators: false) {
+                .background(codeBgColor)
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+                .markdownMargin(top: 8, bottom: 8)
+            }
+            // MARK: - Blockquote
+            .blockquote { configuration in
+                HStack(spacing: 0) {
+                    RoundedRectangle(cornerRadius: 2)
+                        .fill(accentColor.opacity(0.5))
+                        .frame(width: 4)
                     configuration.label
                         .markdownTextStyle {
-                            FontFamilyVariant(.monospaced)
-                            FontSize(14)
+                            ForegroundColor(secondaryColor)
+                            FontSize(baseFontSize - 1)
                         }
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 8)
+                        .padding(.leading, 12)
                 }
+                .markdownMargin(top: 8, bottom: 8)
             }
-            .background(Color.platformControlBackground.opacity(0.6))
-            .clipShape(RoundedRectangle(cornerRadius: 8))
-            .markdownMargin(top: 8, bottom: 8)
-        }
-        // MARK: - Blockquote
-        .blockquote { configuration in
-            HStack(spacing: 0) {
-                RoundedRectangle(cornerRadius: 2)
-                    .fill(Color.accentColor.opacity(0.5))
-                    .frame(width: 4)
+            // MARK: - Table
+            .table { configuration in
+                configuration.label
+                    .markdownTableBorderStyle(
+                        TableBorderStyle(color: borderColor)
+                    )
+                    .markdownTableBackgroundStyle(
+                        .alternatingRows(Color.clear, tableZebra)
+                    )
+                    .markdownMargin(top: 8, bottom: 8)
+            }
+            .tableCell { configuration in
                 configuration.label
                     .markdownTextStyle {
-                        ForegroundColor(.secondary)
-                        FontSize(baseFontSize - 1)
+                        if configuration.row == 0 {
+                            FontWeight(.semibold)
+                        }
+                        FontSize(14)
                     }
-                    .padding(.leading, 12)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
             }
-            .markdownMargin(top: 8, bottom: 8)
-        }
-        // MARK: - Table
-        .table { configuration in
-            configuration.label
-                .markdownTableBorderStyle(
-                    TableBorderStyle(color: Color.platformSeparator)
-                )
-                .markdownTableBackgroundStyle(
-                    .alternatingRows(Color.clear, Color.platformControlBackground.opacity(0.3))
-                )
-                .markdownMargin(top: 8, bottom: 8)
-        }
-        .tableCell { configuration in
-            configuration.label
-                .markdownTextStyle {
-                    if configuration.row == 0 {
-                        FontWeight(.semibold)
-                    }
-                    FontSize(14)
-                }
-                .padding(.horizontal, 10)
-                .padding(.vertical, 6)
-        }
-        // MARK: - Paragraph
-        .paragraph { configuration in
-            configuration.label
-                .markdownMargin(top: 4, bottom: 10)
-                .lineSpacing(6)
-        }
-        // MARK: - List
-        .listItem { configuration in
-            configuration.label
-                .markdownMargin(top: 2, bottom: 2)
-        }
-        // MARK: - Thematic Break
-        .thematicBreak {
-            Divider()
-                .markdownMargin(top: 16, bottom: 16)
-        }
-        // MARK: - Links
-        .link {
-            ForegroundColor(.accentColor)
-        }
-        // MARK: - Strong/Emphasis
-        .strong {
-            FontWeight(.bold)
-        }
-        .emphasis {
-            FontStyle(.italic)
-        }
-        .strikethrough {
-            StrikethroughStyle(.single)
-        }
+            // MARK: - Paragraph
+            .paragraph { configuration in
+                configuration.label
+                    .markdownMargin(top: 4, bottom: 10)
+                    .lineSpacing(6)
+            }
+            // MARK: - List
+            .listItem { configuration in
+                configuration.label
+                    .markdownMargin(top: 2, bottom: 2)
+            }
+            // MARK: - Thematic Break
+            .thematicBreak {
+                Divider()
+                    .markdownMargin(top: 16, bottom: 16)
+            }
+            // MARK: - Links
+            .link {
+                ForegroundColor(linkColor)
+            }
+            // MARK: - Strong/Emphasis
+            .strong {
+                FontWeight(.bold)
+            }
+            .emphasis {
+                FontStyle(.italic)
+            }
+            .strikethrough {
+                StrikethroughStyle(.single)
+            }
+    }
 }

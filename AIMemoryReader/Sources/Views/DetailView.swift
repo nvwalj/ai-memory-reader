@@ -4,6 +4,11 @@ import SwiftUI
 
 struct DetailView: View {
     @Environment(AppState.self) private var appState
+    @Environment(\.colorScheme) private var colorScheme
+
+    private var palette: ThemePalette {
+        ThemePalette.resolve(appState.appTheme, colorScheme: colorScheme)
+    }
 
     var body: some View {
         Group {
@@ -13,16 +18,18 @@ struct DetailView: View {
                 placeholderView
             }
         }
+        .environment(\.themePalette, palette)
+        .background(palette.isEyeCare ? AnyShapeStyle(palette.background) : AnyShapeStyle(Color.clear))
     }
 
     private var placeholderView: some View {
         VStack(spacing: 16) {
             Image(systemName: "text.document")
                 .font(.system(size: 56))
-                .foregroundColor(.secondary.opacity(0.6))
+                .foregroundColor((palette.isEyeCare ? palette.secondaryText : Color.secondary).opacity(0.6))
             Text("Select a file to view")
                 .font(.title2)
-                .foregroundColor(.secondary)
+                .foregroundColor(palette.isEyeCare ? palette.secondaryText : .secondary)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
@@ -30,6 +37,7 @@ struct DetailView: View {
 
 struct MarkdownDetailView: View {
     @Environment(AppState.self) private var appState
+    @Environment(\.themePalette) private var palette
     let fileNode: FileNode
     let fileChangeToken: Int
     @State private var rawContent: String?
@@ -44,6 +52,12 @@ struct MarkdownDetailView: View {
     @State private var saveState: SaveState = .idle
     @State private var autoSaveTask: Task<Void, Never>?
 
+    // MARK: - Find in page
+    @State private var isFindActive = false
+    @State private var findQuery: String = ""
+    @State private var findMatches: [FindMatch] = []
+    @State private var findCurrentIndex: Int = 0
+
     enum SaveState: Equatable {
         case idle
         case saving
@@ -54,6 +68,23 @@ struct MarkdownDetailView: View {
         VStack(spacing: 0) {
             titleBar
             Divider()
+
+            if isFindActive {
+                FileFindBar(
+                    query: Binding(
+                        get: { findQuery },
+                        set: { newValue in
+                            findQuery = newValue
+                            recomputeFindMatches()
+                        }
+                    ),
+                    matchCount: findMatches.count,
+                    currentIndex: findCurrentIndex,
+                    onPrevious: gotoPreviousMatch,
+                    onNext: gotoNextMatch,
+                    onClose: closeFind
+                )
+            }
 
             if let error = loadError {
                 errorView(error)
@@ -76,6 +107,9 @@ struct MarkdownDetailView: View {
             if !isEditMode {
                 Task { await loadFile() }
             }
+        }
+        .onChange(of: appState.findInFileToken) { _, _ in
+            openFind()
         }
         .onDisappear {
             autoSaveTask?.cancel()
@@ -108,9 +142,10 @@ struct MarkdownDetailView: View {
     private var titleBar: some View {
         HStack {
             Image(systemName: fileNode.isJSON ? "curlybraces" : "doc.text")
-                .foregroundColor(.accentColor)
+                .foregroundColor(palette.accent)
             Text(fileNode.name)
                 .font(.headline)
+                .foregroundColor(palette.isEyeCare ? palette.text : .primary)
             Spacer()
 
             // Save state indicator
@@ -121,7 +156,7 @@ struct MarkdownDetailView: View {
             if let raw = rawContent {
                 Text("\(raw.count) chars")
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(palette.isEyeCare ? palette.secondaryText : .secondary)
             }
 
             // Edit/Preview toggle button
@@ -129,7 +164,8 @@ struct MarkdownDetailView: View {
                 toggleEditMode()
             } label: {
                 Image(systemName: isEditMode ? "eye" : "pencil")
-                    .foregroundColor(isEditMode ? .accentColor : .secondary)
+                    .foregroundColor(isEditMode ? palette.accent
+                                                 : (palette.isEyeCare ? palette.secondaryText : .secondary))
             }
             .buttonStyle(.plain)
             .help(isEditMode ? "Switch to Read mode (⌘E)" : "Switch to Edit mode (⌘E)")
@@ -142,7 +178,8 @@ struct MarkdownDetailView: View {
                     }
                 } label: {
                     Image(systemName: "sidebar.right")
-                        .foregroundColor(showTOC ? .accentColor : .secondary)
+                        .foregroundColor(showTOC ? palette.accent
+                                                 : (palette.isEyeCare ? palette.secondaryText : .secondary))
                 }
                 .buttonStyle(.plain)
                 .help(showTOC ? "Hide Table of Contents" : "Show Table of Contents")
@@ -150,7 +187,7 @@ struct MarkdownDetailView: View {
         }
         .padding(.horizontal, 20)
         .padding(.vertical, 10)
-        .background(.bar)
+        .background(palette.isEyeCare ? AnyShapeStyle(palette.secondaryBackground) : AnyShapeStyle(.bar))
     }
 
     // MARK: - Save Indicator
@@ -198,20 +235,28 @@ struct MarkdownDetailView: View {
     }
 
     private var readView: some View {
-        HStack(spacing: 0) {
+        let currentMatchSectionID: String? = findMatches.indices.contains(findCurrentIndex)
+            ? findMatches[findCurrentIndex].sectionID
+            : nil
+        let matchingSectionIDs: Set<String> = Set(findMatches.map(\.sectionID))
+
+        return HStack(spacing: 0) {
             // Main markdown content
             ScrollViewReader { proxy in
                 ScrollView {
                     LazyVStack(alignment: .leading, spacing: 0) {
                         ForEach(sections) { section in
                             Markdown(section.content)
-                                .markdownTheme(.memoryReader)
+                                .markdownTheme(.memoryReader(palette: palette))
                                 .markdownCodeSyntaxHighlighter(.splash)
                                 .markdownImageProvider(.localFile(basePath: fileBaseURL))
                                 .textSelection(.enabled)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                                 .padding(.horizontal, 24)
                                 .padding(.vertical, 2)
+                                .background(findHighlightBackground(for: section.id,
+                                                                     current: currentMatchSectionID,
+                                                                     all: matchingSectionIDs))
                                 .id(section.id)
                                 .onAppear {
                                     if tocEntries.contains(where: { $0.id == section.id }) {
@@ -225,12 +270,20 @@ struct MarkdownDetailView: View {
                         return Self.handleLocalLink(url: url, baseURL: fileBaseURL)
                     })
                 }
+                .background(palette.isEyeCare ? AnyShapeStyle(palette.background) : AnyShapeStyle(Color.clear))
                 .onChange(of: scrollTarget) { _, newValue in
                     if let target = newValue {
                         withAnimation(.easeInOut(duration: 0.3)) {
                             proxy.scrollTo(target, anchor: .top)
                         }
                         scrollTarget = nil
+                    }
+                }
+                .onChange(of: findCurrentIndex) { _, _ in
+                    if let id = currentMatchSectionID {
+                        withAnimation(.easeInOut(duration: 0.25)) {
+                            proxy.scrollTo(id, anchor: .center)
+                        }
                     }
                 }
             }
@@ -246,6 +299,24 @@ struct MarkdownDetailView: View {
                     scrollTarget = entry.id
                 }
             }
+        }
+    }
+
+    /// Background for a section when find-in-page is active.
+    @ViewBuilder
+    private func findHighlightBackground(for sectionID: String,
+                                          current: String?,
+                                          all: Set<String>) -> some View {
+        if sectionID == current {
+            RoundedRectangle(cornerRadius: 6)
+                .fill(palette.findCurrent)
+                .padding(.horizontal, 10)
+        } else if all.contains(sectionID) {
+            RoundedRectangle(cornerRadius: 6)
+                .fill(palette.findMatch)
+                .padding(.horizontal, 10)
+        } else {
+            Color.clear
         }
     }
 
@@ -267,6 +338,9 @@ struct MarkdownDetailView: View {
             // Switching from Read → Edit: load content into editor
             editableContent = rawContent ?? ""
         }
+        // Close our in-page find bar whenever mode flips — edit mode uses the
+        // NSTextView system Find Bar instead, and we don't want both visible.
+        closeFind()
         withAnimation(.easeInOut(duration: 0.15)) {
             isEditMode.toggle()
         }
@@ -316,6 +390,51 @@ struct MarkdownDetailView: View {
 
     func manualSave() {
         saveIfNeeded()
+    }
+
+    // MARK: - Find in File
+
+    private func openFind() {
+        guard rawContent != nil else { return }
+        if isEditMode {
+            // Edit mode delegates to NSTextView's built-in Find Bar.
+            NotificationCenter.default.post(name: .editorShowFindBar, object: nil)
+            return
+        }
+        isFindActive = true
+        recomputeFindMatches()
+    }
+
+    private func closeFind() {
+        isFindActive = false
+        findQuery = ""
+        findMatches = []
+        findCurrentIndex = 0
+    }
+
+    private func recomputeFindMatches() {
+        guard isFindActive, let raw = rawContent, !findQuery.isEmpty else {
+            findMatches = []
+            findCurrentIndex = 0
+            return
+        }
+        let matches = FindMatcher.compute(in: raw, query: findQuery, sections: sections)
+        findMatches = matches
+        if matches.isEmpty {
+            findCurrentIndex = 0
+        } else {
+            findCurrentIndex = min(findCurrentIndex, matches.count - 1)
+        }
+    }
+
+    private func gotoNextMatch() {
+        guard !findMatches.isEmpty else { return }
+        findCurrentIndex = (findCurrentIndex + 1) % findMatches.count
+    }
+
+    private func gotoPreviousMatch() {
+        guard !findMatches.isEmpty else { return }
+        findCurrentIndex = (findCurrentIndex - 1 + findMatches.count) % findMatches.count
     }
 
     // MARK: - Link Handling

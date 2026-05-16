@@ -67,23 +67,29 @@ AI Memory Reader 是免费开源软件。如果它帮你节省了时间，或者
 
 ## 安装
 
-1. 克隆仓库：
-   ```bash
-   git clone https://github.com/nvwalj/ai-memory-reader.git
-   cd ai-memory-reader
-   ```
+### 方案 1 — 下载（最快，不需要 Xcode）
 
-2. 生成 Xcode 项目（需要 [XcodeGen](https://github.com/yonaskolb/XcodeGen)）：
-   ```bash
-   xcodegen generate
-   ```
+1. 下载最新 [`AI-Memory-Reader-0.4.0-universal.zip`](https://github.com/nvwalj/ai-memory-reader/releases/latest) — 通用二进制，Apple Silicon 和 Intel Mac 都能跑。
+2. 解压后把 `AI Memory Reader.app` 拖到 `/Applications`。
+3. **首次启动：** macOS 会提示"未识别的开发者"（应用是 ad-hoc 签名，尚未公证）。两种绕过方式：
+   - **图形界面：** Finder 里右键 app → **打开** → 弹窗里再点 **打开**。一次通过后双击就能用了。
+   - **终端一条命令：**
+     ```bash
+     xattr -dr com.apple.quarantine "/Applications/AI Memory Reader.app"
+     ```
 
-3. 打开 Xcode：
-   ```bash
-   open AIMemoryReader.xcodeproj
-   ```
+> 公证后的版本会在配 Developer ID 之后推出。
 
-4. 编译运行（⌘R）
+### 方案 2 — 从源码构建
+
+```bash
+git clone https://github.com/nvwalj/ai-memory-reader.git
+cd ai-memory-reader
+brew install xcodegen   # 没装的话先装
+xcodegen generate
+open AIMemoryReader.xcodeproj
+# ⌘R 编译运行
+```
 
 ### 命令行工具（可选）
 

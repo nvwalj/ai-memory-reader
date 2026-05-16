@@ -57,23 +57,29 @@ Also supports opening any local folder or individual .md file.
 
 ## Installation
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/nvwalj/ai-memory-reader.git
-   cd ai-memory-reader
-   ```
+### Option 1 — Download (fastest, no Xcode needed)
 
-2. Generate the Xcode project (requires [XcodeGen](https://github.com/yonaskolb/XcodeGen)):
-   ```bash
-   xcodegen generate
-   ```
+1. Download the latest [`AI-Memory-Reader-0.4.0-universal.zip`](https://github.com/nvwalj/ai-memory-reader/releases/latest) — universal binary, runs on both Apple Silicon and Intel Macs.
+2. Unzip and drag `AI Memory Reader.app` into `/Applications`.
+3. **First launch:** macOS will say *"unidentified developer"* because the binary is ad-hoc signed (not yet notarized). Two ways to bypass:
+   - **GUI:** right-click the app in Finder → **Open** → click **Open** in the dialog. Once approved, double-click works forever.
+   - **Terminal one-liner:**
+     ```bash
+     xattr -dr com.apple.quarantine "/Applications/AI Memory Reader.app"
+     ```
 
-3. Open in Xcode:
-   ```bash
-   open AIMemoryReader.xcodeproj
-   ```
+> A notarized build will ship once a Developer ID is set up.
 
-4. Build and run (⌘R)
+### Option 2 — Build from source
+
+```bash
+git clone https://github.com/nvwalj/ai-memory-reader.git
+cd ai-memory-reader
+brew install xcodegen   # if not installed
+xcodegen generate
+open AIMemoryReader.xcodeproj
+# ⌘R to build & run
+```
 
 ### CLI Setup (optional)
 

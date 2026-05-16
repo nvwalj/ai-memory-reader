@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>AI Memory Reader — Native macOS App for Claude Code, OpenClaw, Codex Memory</title>
+<meta name="description" content="The native macOS &amp; iOS app for browsing AI agent memory files. Auto-detects Claude Code (~/.claude/CLAUDE.md), OpenClaw, Codex, Cursor, Gemini, Continue, Aider, GitHub Copilot. Free, open source.">
+<meta name="keywords" content="claude code memory, CLAUDE.md viewer, claude code mac app, AI agent memory, claude code GUI, openclaw memory reader, codex memory viewer, cursor memory, gemini memory mac">
+<meta property="og:title" content="AI Memory Reader — Native macOS App for AI Agent Memory">
+<meta property="og:description" content="The native macOS &amp; iOS app for browsing Claude Code, OpenClaw, Codex, Cursor, Gemini memory files. Free &amp; open source.">
+<meta property="og:url" content="https://nvwalj.github.io/ai-memory-reader/">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AI Memory Reader — Native macOS App for AI Agent Memory">
+<meta name="twitter:description" content="Browse your Claude Code, OpenClaw, Codex memory files in a beautiful native Mac &amp; iOS app. Free &amp; open source.">
+<link rel="canonical" href="https://nvwalj.github.io/ai-memory-reader/">
+<style>
+:root {
+  --bg: #0d1117; --fg: #e6edf3; --muted: #8b949e; --accent: #f78166;
+  --card: #161b22; --border: #30363d; --kofi: #FF5E5B;
+}
+@media (prefers-color-scheme: light) {
+  :root { --bg: #ffffff; --fg: #1f2328; --muted: #59636e; --accent: #d97706;
+    --card: #f6f8fa; --border: #d0d7de; }
+}
+* { box-sizing: border-box; }
+body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", Segoe UI, Roboto, sans-serif;
+  background: var(--bg); color: var(--fg); line-height: 1.6; }
+.container { max-width: 920px; margin: 0 auto; padding: 0 24px; }
+header { padding: 80px 0 40px; text-align: center; }
+.eyebrow { color: var(--muted); font-size: 14px; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px; }
+h1 { font-size: clamp(36px, 6vw, 56px); margin: 0 0 16px; line-height: 1.1; font-weight: 700; }
+.tagline { font-size: clamp(18px, 2.5vw, 22px); color: var(--muted); margin: 0 auto 36px; max-width: 640px; }
+.cta { display: inline-flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+.btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; border-radius: 8px;
+  text-decoration: none; font-weight: 600; transition: all 0.2s; font-size: 16px; }
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-primary:hover { transform: translateY(-1px); opacity: 0.92; }
+.btn-secondary { border: 1px solid var(--border); color: var(--fg); background: var(--card); }
+.btn-secondary:hover { border-color: var(--accent); }
+.btn-kofi { background: var(--kofi); color: #fff; }
+.btn-kofi:hover { transform: translateY(-1px); opacity: 0.92; }
+.hero-img { margin: 56px auto 0; max-width: 100%; border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,0.4); border: 1px solid var(--border); }
+section { padding: 56px 0; border-top: 1px solid var(--border); }
+h2 { font-size: 32px; margin: 0 0 24px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; }
+.card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 24px; }
+.card h3 { margin: 0 0 8px; font-size: 18px; }
+.card p { margin: 0; color: var(--muted); font-size: 15px; }
+.kbd { font-family: ui-monospace, SF Mono, Monaco, monospace; background: var(--card);
+  border: 1px solid var(--border); border-radius: 4px; padding: 2px 6px; font-size: 14px; }
+pre { background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 16px; overflow-x: auto; font-size: 14px; }
+code { font-family: ui-monospace, SF Mono, Monaco, monospace; }
+.sources { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+.source-tag { background: var(--card); border: 1px solid var(--border); border-radius: 16px;
+  padding: 4px 12px; font-size: 13px; color: var(--muted); }
+.support { text-align: center; padding: 80px 0; }
+.support h2 { margin-bottom: 16px; }
+.support p { color: var(--muted); max-width: 540px; margin: 0 auto 32px; }
+footer { padding: 40px 0 60px; text-align: center; color: var(--muted); font-size: 14px;
+  border-top: 1px solid var(--border); }
+footer a { color: var(--muted); }
+.faq dt { font-weight: 600; margin-top: 20px; }
+.faq dd { margin: 6px 0 0; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="eyebrow">Native macOS &amp; iOS · Free &amp; Open Source · GPL-3.0</div>
+    <h1>Browse Your AI Agent's Memory</h1>
+    <p class="tagline">
+      The native Mac &amp; iPhone app for reading <strong>Claude Code</strong>, <strong>OpenClaw</strong>,
+      <strong>Codex</strong>, <strong>Cursor</strong>, <strong>Gemini</strong>, and more AI agent memory files —
+      beautifully rendered, instantly searchable.
+    </p>
+    <div class="cta">
+      <a class="btn btn-primary" href="https://github.com/nvwalj/ai-memory-reader/releases/latest">
+        ⬇ Download for macOS
+      </a>
+      <a class="btn btn-secondary" href="https://github.com/nvwalj/ai-memory-reader">
+        ⭐ Star on GitHub
+      </a>
+      <a class="btn btn-kofi" href="https://ko-fi.com/nvwalj">
+        ☕ Support on Ko-fi
+      </a>
+    </div>
+    <img class="hero-img" src="https://raw.githubusercontent.com/nvwalj/ai-memory-reader/main/home.png" alt="AI Memory Reader screenshot showing the macOS app with sidebar, beautifully rendered CLAUDE.md content, and table of contents">
+  </div>
+</header>
+
+<section>
+  <div class="container">
+    <h2>Auto-detects 8+ AI tools</h2>
+    <p>Drop the app in your Applications folder. It finds your existing memory directories automatically — no config, no setup.</p>
+    <div class="sources">
+      <span class="source-tag">Claude Code (<code>~/.claude</code>)</span>
+      <span class="source-tag">Project-level <code>CLAUDE.md</code></span>
+      <span class="source-tag">OpenClaw</span>
+      <span class="source-tag">Codex</span>
+      <span class="source-tag">Cursor</span>
+      <span class="source-tag">Gemini</span>
+      <span class="source-tag">Continue</span>
+      <span class="source-tag">Aider</span>
+      <span class="source-tag">GitHub Copilot</span>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <h2>What's inside</h2>
+    <div class="grid">
+      <div class="card">
+        <h3>📝 Beautiful rendering</h3>
+        <p>GitHub-style markdown with code blocks, tables, lists. Powered by MarkdownUI.</p>
+      </div>
+      <div class="card">
+        <h3>🔍 In-page find</h3>
+        <p><span class="kbd">⌘F</span> with character-level highlighting. Search all files in the sidebar.</p>
+      </div>
+      <div class="card">
+        <h3>✏️ Edit mode</h3>
+        <p><span class="kbd">⌘E</span> toggles inline editing with syntax highlighting and auto-save.</p>
+      </div>
+      <div class="card">
+        <h3>🌳 Sidebar tree + TOC</h3>
+        <p>Expandable file tree on the left, click-to-jump TOC on the right.</p>
+      </div>
+      <div class="card">
+        <h3>🔌 Agent integration</h3>
+        <p>URL scheme <code>aimemoryreader://</code> and CLI <code>aimr</code> let agents jump to any heading.</p>
+      </div>
+      <div class="card">
+        <h3>📱 iPhone too</h3>
+        <p>Read-only iPhone version with native navigation and Files-app integration.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <h2>Install in 30 seconds</h2>
+    <p>Universal binary (Apple Silicon + Intel). No Xcode required.</p>
+    <pre><code># 1. Download
+curl -L -o aimr.zip https://github.com/nvwalj/ai-memory-reader/releases/latest/download/AI-Memory-Reader-0.4.0-universal.zip
+unzip aimr.zip -d /Applications/
+
+# 2. Strip Gatekeeper quarantine (or right-click → Open)
+xattr -dr com.apple.quarantine "/Applications/AI Memory Reader.app"
+
+# 3. Launch
+open "/Applications/AI Memory Reader.app"</code></pre>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <h2>Built for the Claude Code workflow</h2>
+    <p>If you spend a lot of time in Claude Code, you know <code>~/.claude/CLAUDE.md</code> and per-project <code>CLAUDE.md</code> files become your "second brain." Opening them in TextEdit feels wrong. AI Memory Reader treats them with the care they deserve:</p>
+    <ul>
+      <li><strong>Today panel</strong> — auto-highlights today's <code>memory/YYYY-MM-DD.md</code></li>
+      <li><strong>File watching</strong> — reloads when Claude writes to memory</li>
+      <li><strong>URL scheme</strong> — agents can jump to a specific heading: <code>aimemoryreader://open?path=...&amp;heading=...</code></li>
+      <li><strong>JSON support</strong> — inspect AI tool config files</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <div class="container faq">
+    <h2>FAQ</h2>
+    <dl>
+      <dt>Is it free?</dt>
+      <dd>Yes, GPL-3.0. The binary release is free. Optional <a href="https://ko-fi.com/nvwalj">Ko-fi donations</a> directly fund development.</dd>
+
+      <dt>Does it work on Intel Macs?</dt>
+      <dd>Yes, universal binary covers both Apple Silicon and Intel.</dd>
+
+      <dt>Why does macOS say "unidentified developer"?</dt>
+      <dd>The build is ad-hoc signed (notarization requires an Apple Developer membership). Either right-click → Open, or run <code>xattr -dr com.apple.quarantine "/Applications/AI Memory Reader.app"</code> once.</dd>
+
+      <dt>How does it differ from claude-mem / memsearch?</dt>
+      <dd>Those are CLI/web dashboards focused on capturing memory. AI Memory Reader is purely a native app for <em>browsing</em> and lightly <em>editing</em> the memory files those tools (or Claude Code itself) create.</dd>
+
+      <dt>iPhone version — what's the use case?</dt>
+      <dd>Open the Files app on iPhone, tap any <code>CLAUDE.md</code> shared via iCloud Drive — AI Memory Reader renders it. Useful for reviewing your project notes on the go.</dd>
+
+      <dt>How do I contribute / report bugs?</dt>
+      <dd><a href="https://github.com/nvwalj/ai-memory-reader/issues">Open an issue on GitHub</a>. PRs welcome.</dd>
+    </dl>
+  </div>
+</section>
+
+<section class="support">
+  <div class="container">
+    <h2>❤️ Support development</h2>
+    <p>AI Memory Reader is free and open source. If it saves you time, a coffee on Ko-fi directly funds new features (Claude Desktop support, cloud sync, custom themes are on the roadmap).</p>
+    <a class="btn btn-kofi" href="https://ko-fi.com/nvwalj" style="padding: 16px 32px; font-size: 18px;">
+      ☕ Buy me a coffee
+    </a>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <p>
+      <a href="https://github.com/nvwalj/ai-memory-reader">GitHub</a> ·
+      <a href="https://github.com/nvwalj/ai-memory-reader/releases">Releases</a> ·
+      <a href="https://github.com/nvwalj/ai-memory-reader/issues">Issues</a> ·
+      <a href="https://ko-fi.com/nvwalj">Ko-fi</a>
+    </p>
+    <p>© 2026 nvwalj · GPL-3.0 · Built with SwiftUI</p>
+  </div>
+</footer>
+
+</body>
+</html>

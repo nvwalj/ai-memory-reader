@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Where Does Claude Code Store Memory? Complete Guide to CLAUDE.md Files</title>
+<meta name="description" content="A complete guide to Claude Code's memory system: locations of CLAUDE.md files, ~/.claude/ directory structure, project-level vs global memory, and how to read/edit them efficiently on macOS.">
+<meta name="keywords" content="claude code memory location, CLAUDE.md location, where is CLAUDE.md stored, claude code ~/.claude, claude code memory files, claude code project memory, claude code global memory, edit CLAUDE.md mac, view CLAUDE.md mac">
+<link rel="canonical" href="https://nvwalj.github.io/ai-memory-reader/claude-code-memory-guide.html">
+<meta property="og:title" content="Where Does Claude Code Store Memory? Complete Guide to CLAUDE.md">
+<meta property="og:description" content="A practical guide to Claude Code's memory system on macOS — file locations, hierarchy, and the best way to browse them.">
+<meta property="og:type" content="article">
+<style>
+:root { --bg: #0d1117; --fg: #e6edf3; --muted: #8b949e; --accent: #f78166;
+  --card: #161b22; --border: #30363d; --kofi: #FF5E5B; }
+@media (prefers-color-scheme: light) {
+  :root { --bg: #ffffff; --fg: #1f2328; --muted: #59636e; --accent: #d97706;
+    --card: #f6f8fa; --border: #d0d7de; }
+}
+body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", Segoe UI, sans-serif;
+  background: var(--bg); color: var(--fg); line-height: 1.7; max-width: 760px; margin: 0 auto; padding: 40px 24px; }
+a { color: var(--accent); }
+h1 { font-size: 36px; margin-bottom: 8px; line-height: 1.2; }
+h2 { font-size: 24px; margin-top: 40px; }
+h3 { font-size: 18px; margin-top: 24px; }
+.meta { color: var(--muted); font-size: 14px; margin-bottom: 32px; }
+code, pre { font-family: ui-monospace, SF Mono, Monaco, monospace; }
+code { background: var(--card); padding: 2px 6px; border-radius: 4px; font-size: 0.92em; }
+pre { background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 16px; overflow-x: auto; font-size: 14px; line-height: 1.5; }
+pre code { background: transparent; padding: 0; }
+table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+th, td { border: 1px solid var(--border); padding: 8px 12px; text-align: left; }
+th { background: var(--card); }
+.cta { background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+  padding: 24px; margin: 32px 0; }
+.cta a { font-weight: 600; }
+.btn { display: inline-block; background: var(--accent); color: #fff; padding: 10px 20px;
+  border-radius: 8px; text-decoration: none; font-weight: 600; margin-top: 12px; }
+.btn-kofi { background: var(--kofi); }
+.nav { color: var(--muted); margin-bottom: 32px; }
+footer { color: var(--muted); border-top: 1px solid var(--border); margin-top: 60px; padding-top: 24px; font-size: 14px; }
+</style>
+</head>
+<body>
+<div class="nav"><a href="/ai-memory-reader/">← AI Memory Reader</a></div>
+
+<article>
+<h1>Where Does Claude Code Store Memory? Complete Guide to CLAUDE.md Files</h1>
+<p class="meta">Posted May 16, 2026 · 6 min read</p>
+
+<p>If you've been using <strong>Claude Code</strong> for any length of time, you've probably noticed it remembers things between sessions — your coding style, project conventions, decisions you've explained once. That memory lives in plain Markdown files on your machine. This guide explains exactly <em>where</em> they live, <em>how</em> the hierarchy works, and the most ergonomic way to browse and edit them on macOS.</p>
+
+<h2>The Three Layers of Claude Code Memory</h2>
+
+<p>Claude Code uses a layered memory system. From most-specific to most-general:</p>
+
+<table>
+<thead><tr><th>Layer</th><th>Location</th><th>Purpose</th></tr></thead>
+<tbody>
+<tr><td><strong>Project</strong></td><td><code>./CLAUDE.md</code> (and parent dirs)</td><td>Team-shared knowledge about <em>this</em> codebase — patterns, conventions, things to avoid</td></tr>
+<tr><td><strong>Project (local)</strong></td><td><code>./CLAUDE.local.md</code></td><td>Personal notes for this codebase, gitignored</td></tr>
+<tr><td><strong>Global</strong></td><td><code>~/.claude/CLAUDE.md</code></td><td>Your personal preferences — applies to every project</td></tr>
+<tr><td><strong>Auto-memory</strong></td><td><code>~/.claude/projects/&lt;path&gt;/memory/MEMORY.md</code></td><td>Claude's auto-accumulated notes per project, written by the agent itself</td></tr>
+</tbody>
+</table>
+
+<p>When Claude Code starts a session, it loads all of these in order from most-specific to most-general. Earlier rules win on conflict.</p>
+
+<h2>The <code>~/.claude/</code> Directory in Detail</h2>
+
+<p>On macOS your global Claude Code data lives at <code>~/.claude/</code>. The relevant files:</p>
+
+<pre><code>~/.claude/
+├── CLAUDE.md              # Your global preferences (you edit)
+├── projects/              # Per-project auto-memory (Claude writes)
+│   └── -Users-you-Projects-app/
+│       └── memory/
+│           ├── MEMORY.md          # Index of memory files
+│           └── 2026-05-16.md      # Daily memory log
+├── settings.json          # User settings
+└── projects/.../sessions/ # Per-session transcripts (JSONL)
+</code></pre>
+
+<p>The <code>memory/</code> folders are particularly interesting — they accumulate over weeks of work and become a real "second brain" for each project. Reviewing them periodically often reveals patterns you didn't realize Claude had picked up.</p>
+
+<h2>Project-Level <code>CLAUDE.md</code></h2>
+
+<p>Drop a <code>CLAUDE.md</code> in any project root and Claude Code will load it whenever you work in that directory. Useful contents:</p>
+
+<ul>
+<li>Build/test commands and how to run them</li>
+<li>Naming conventions specific to this codebase</li>
+<li>Architectural decisions and tradeoffs Claude shouldn't re-litigate</li>
+<li>Known landmines ("don't touch the legacy auth module without checking with X")</li>
+<li>Coding style preferences (formatter quirks, comment policy, etc.)</li>
+</ul>
+
+<p>Claude Code <em>also</em> looks for <code>CLAUDE.md</code> in <em>parent</em> directories. If you have several related projects under <code>~/code/myorg/</code>, drop a <code>CLAUDE.md</code> there with org-wide conventions and every sub-project inherits them.</p>
+
+<h2>How to Read and Edit These Files Efficiently</h2>
+
+<p>The naive way: open them in a text editor. The problem is they grow into hundreds of lines, are pure Markdown (so renderless plain text is ugly), and aren't always in obvious places.</p>
+
+<p>Three ergonomic options:</p>
+
+<h3>1. Native Mac/iOS app — <a href="https://github.com/nvwalj/ai-memory-reader">AI Memory Reader</a></h3>
+<p>The tool this guide ships with. Auto-detects <code>~/.claude/</code> (and 7 other AI tool dirs), renders Markdown beautifully, lets you search and edit. Free, GPL-3.0.</p>
+
+<h3>2. <code>claude-mem</code> — CLI/web dashboard</h3>
+<p>If you prefer a terminal/web workflow, <a href="https://github.com/thedotmack/claude-mem">claude-mem</a> compresses session activity into structured memory and provides a local dashboard.</p>
+
+<h3>3. Just <code>cat</code> + a markdown CLI renderer</h3>
+<p>For the minimalist: <code>cat ~/.claude/CLAUDE.md | glow -</code> or <code>cat ~/.claude/CLAUDE.md | mdcat</code>.</p>
+
+<h2>A Few Tricks Worth Knowing</h2>
+
+<ul>
+<li><strong>Run <code>/memory</code> inside Claude Code</strong> to see exactly which memory files Claude has loaded for the current session, in order.</li>
+<li><strong>Use <code>CLAUDE.local.md</code></strong> for personal scratch notes Claude should see but your team shouldn't. It's gitignored by Claude Code's default templates.</li>
+<li><strong>Don't over-write CLAUDE.md.</strong> Concise rules with <em>why</em> beat long lists of <em>what</em>. Claude is smarter than you'd think — give it principles, not micromanagement.</li>
+<li><strong>Auto-memory in <code>memory/YYYY-MM-DD.md</code></strong> is Claude's daily journal. It's append-only and growing — periodically distill the useful patterns into your main <code>CLAUDE.md</code>.</li>
+</ul>
+
+<h2>Related AI Tool Memory Locations</h2>
+
+<p>If you use other AI coding agents, here's where their memory lives on macOS:</p>
+
+<table>
+<thead><tr><th>Tool</th><th>Location</th></tr></thead>
+<tbody>
+<tr><td>OpenClaw</td><td><code>~/.openclaw/workspace/</code></td></tr>
+<tr><td>OpenAI Codex</td><td><code>~/.codex/</code></td></tr>
+<tr><td>Google Gemini CLI</td><td><code>~/.gemini/</code></td></tr>
+<tr><td>Continue</td><td><code>~/.continue/</code></td></tr>
+<tr><td>Cursor</td><td><code>~/.cursor/</code></td></tr>
+<tr><td>Aider</td><td><code>~/.aider/</code></td></tr>
+<tr><td>GitHub Copilot CLI</td><td><code>~/.config/github-copilot/</code></td></tr>
+</tbody>
+</table>
+
+<div class="cta">
+<strong>🧠 Want to browse all of these in one beautiful native app?</strong>
+<p>AI Memory Reader is a free, open-source macOS &amp; iOS app that auto-detects every AI tool's memory directory and renders the files like GitHub. ⌘F to search, ⌘E to edit, CLI integration for agents.</p>
+<a class="btn" href="https://github.com/nvwalj/ai-memory-reader/releases/latest">⬇ Download for macOS</a>
+<a class="btn btn-kofi" href="https://ko-fi.com/nvwalj" style="margin-left: 8px;">☕ Support on Ko-fi</a>
+</div>
+
+<footer>
+<p><a href="/ai-memory-reader/">← Back to AI Memory Reader</a> · <a href="https://github.com/nvwalj/ai-memory-reader">GitHub</a> · <a href="https://ko-fi.com/nvwalj">Ko-fi</a></p>
+<p>© 2026 nvwalj · Article licensed CC-BY-4.0</p>
+</footer>
+</article>
+</body>
+</html>

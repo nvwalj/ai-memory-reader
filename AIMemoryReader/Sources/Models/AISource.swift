@@ -26,8 +26,11 @@ struct AISource: Identifiable, Hashable {
         }
         return FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent(path)
         #else
-        // On iOS, sources aren't filesystem-based
-        return FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!.appendingPathComponent(path)
+        // On iOS, sources aren't filesystem-based — fall back to a sentinel if the docs dir is unavailable.
+        guard let docs = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else {
+            return URL(fileURLWithPath: "/dev/null")
+        }
+        return docs.appendingPathComponent(path)
         #endif
     }
 

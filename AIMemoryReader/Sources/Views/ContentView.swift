@@ -83,18 +83,18 @@ struct MacContentView: View {
 
         // Filter to supported files only
         let supportedFiles = urls.filter { FileNode.isSupportedFile($0) }
-        guard !supportedFiles.isEmpty else { return }
+        guard let firstFile = supportedFiles.first else { return }
 
         if supportedFiles.count == 1 {
-            appState.openSingleFile(supportedFiles[0])
+            appState.openSingleFile(firstFile)
         } else {
-            let parentDir = supportedFiles[0].deletingLastPathComponent()
+            let parentDir = firstFile.deletingLastPathComponent()
             appState.selectedSourceID = "local"
             appState.isSingleFileMode = false
             appState.loadDirectory(parentDir)
 
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                if let node = appState.findNode(url: supportedFiles[0], in: appState.rootNode) {
+                if let node = appState.findNode(url: firstFile, in: appState.rootNode) {
                     appState.selectedFile = node
                 }
             }

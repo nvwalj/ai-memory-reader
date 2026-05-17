@@ -243,10 +243,13 @@ final class AppState {
             let queryItems = components?.queryItems ?? []
 
             if let path = queryItems.first(where: { $0.name == "path" })?.value {
-                let fileURL = URL(fileURLWithPath: path)
+                // Reject path traversal and non-absolute paths from URL-scheme callers.
+                guard !path.contains("..") && path.hasPrefix("/") else { return }
+                let fileURL = URL(fileURLWithPath: path).standardizedFileURL
+                guard fileURL.path.hasPrefix("/") && !fileURL.path.contains("..") else { return }
                 let heading = queryItems.first(where: { $0.name == "heading" })?.value
 
-                if FileManager.default.fileExists(atPath: path) {
+                if FileManager.default.fileExists(atPath: fileURL.path) {
                     openSingleFile(fileURL)
                     if let heading {
                         pendingURLHeading = heading

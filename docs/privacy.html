@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Privacy Policy — AI Memory Reader</title>
+<meta name="description" content="Privacy policy for AI Memory Reader (macOS/iOS app) and the AI Memory Reader Claude Code plugin (/aimr slash command).">
+<link rel="canonical" href="https://nvwalj.github.io/ai-memory-reader/privacy.html">
+<style>
+:root {
+  --bg: #0d1117; --fg: #e6edf3; --muted: #8b949e; --accent: #f78166;
+  --card: #161b22; --border: #30363d;
+}
+@media (prefers-color-scheme: light) {
+  :root { --bg: #ffffff; --fg: #1f2328; --muted: #59636e; --accent: #d97706;
+    --card: #f6f8fa; --border: #d0d7de; }
+}
+* { box-sizing: border-box; }
+body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", Segoe UI, Roboto, sans-serif;
+  background: var(--bg); color: var(--fg); line-height: 1.7; }
+.container { max-width: 760px; margin: 0 auto; padding: 60px 24px 80px; }
+h1 { font-size: 36px; margin: 0 0 8px; line-height: 1.2; }
+.updated { color: var(--muted); font-size: 14px; margin: 0 0 32px; }
+h2 { font-size: 22px; margin: 40px 0 12px; padding-top: 12px; border-top: 1px solid var(--border); }
+h2:first-of-type { border-top: none; padding-top: 0; }
+p, li { color: var(--fg); }
+ul { padding-left: 24px; }
+li { margin-bottom: 6px; }
+a { color: var(--accent); }
+.back { display: inline-block; margin-bottom: 24px; color: var(--muted); text-decoration: none; }
+.back:hover { color: var(--accent); }
+code { font-family: ui-monospace, SF Mono, Monaco, monospace; background: var(--card);
+  border: 1px solid var(--border); border-radius: 4px; padding: 1px 6px; font-size: 0.9em; }
+.summary { background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 16px 20px; margin: 24px 0; }
+.summary strong { color: var(--accent); }
+footer { color: var(--muted); font-size: 13px; margin-top: 48px; text-align: center; }
+footer a { color: var(--muted); }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<a class="back" href="./">← Back to AI Memory Reader</a>
+
+<h1>Privacy Policy</h1>
+<p class="updated">Last updated: 2026-05-16</p>
+
+<div class="summary">
+<strong>Short version:</strong> AI Memory Reader and the <code>/aimr</code> Claude Code plugin
+run entirely on your device. They do not collect, transmit, or share any personal data, file
+content, or usage telemetry. There is no server, no analytics, no tracking.
+</div>
+
+<h2>1. Scope</h2>
+<p>This policy covers two products published by the AI Memory Reader project:</p>
+<ul>
+  <li><strong>AI Memory Reader</strong> — the native macOS &amp; iOS app distributed via
+      <a href="https://github.com/nvwalj/ai-memory-reader/releases/latest">GitHub Releases</a>.</li>
+  <li><strong>AI Memory Reader plugin for Claude Code</strong> — the <code>/aimr</code> slash command
+      distributed via <a href="https://github.com/nvwalj/aimr-claude-plugin">github.com/nvwalj/aimr-claude-plugin</a>
+      and the Anthropic plugin marketplace.</li>
+</ul>
+
+<h2>2. What data the products handle</h2>
+<p>Both products are read/edit tools for markdown files that already live on your local
+device or filesystem (such as <code>CLAUDE.md</code>, <code>MEMORY.md</code>, or files in
+<code>~/.claude/</code>, <code>~/.openclaw/</code>, etc.). File content is read directly
+from disk and rendered locally.</p>
+
+<h2>3. What data the products send over the network</h2>
+<p><strong>None.</strong></p>
+<ul>
+  <li>The macOS/iOS app has no analytics, no crash reporting service, no telemetry endpoints,
+      and no remote configuration.</li>
+  <li>The <code>/aimr</code> Claude Code plugin is a single slash command that runs the local
+      <code>open</code> shell command to dispatch a <code>aimemoryreader://</code> URL on your
+      machine. It does not make HTTP requests and does not transmit the file path or heading
+      argument to any third party.</li>
+  <li>The only network activity the app may perform is fetching images explicitly embedded in
+      markdown you open (e.g. <code>![](https://example.com/foo.png)</code>). This is the
+      same behavior as any markdown renderer and is initiated by content you choose to view.</li>
+</ul>
+
+<h2>4. What data we collect about you</h2>
+<p><strong>None.</strong> We do not run a backend service. We do not have user accounts.
+We do not see, store, or process any information about your device, files, prompts, AI
+agent memory, or usage patterns.</p>
+
+<h2>5. Third-party services</h2>
+<ul>
+  <li><strong>GitHub</strong> hosts the source code, releases, and this website. GitHub's own
+      privacy policy applies when you download a release or view this page:
+      <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement">GitHub privacy statement</a>.</li>
+  <li><strong>Ko-fi</strong> processes donations on
+      <a href="https://ko-fi.com/nvwalj">ko-fi.com/nvwalj</a>. Donations are entirely optional and
+      handled by Ko-fi and its payment processors. We do not receive payment-card data.
+      See <a href="https://more.ko-fi.com/privacy">Ko-fi's privacy policy</a>.</li>
+</ul>
+<p>The app itself does not contact Ko-fi or GitHub. Visiting those services is initiated
+only when you click the corresponding link.</p>
+
+<h2>6. Permissions the app requests</h2>
+<ul>
+  <li><strong>File access</strong> — required to open and render the markdown files you choose.
+      Files are read on demand; nothing is uploaded.</li>
+  <li><strong>URL scheme handler registration</strong> — so that <code>aimemoryreader://</code>
+      links (used by the <code>/aimr</code> plugin and other agents) can open the app. Handling
+      a URL scheme does not transmit data anywhere.</li>
+</ul>
+
+<h2>7. Children</h2>
+<p>These products are general-purpose developer utilities and are not directed to children
+under 13. We do not knowingly collect data from anyone.</p>
+
+<h2>8. Changes</h2>
+<p>If this policy ever changes, the updated text will appear at this URL and the "Last updated"
+date above will change. Material changes will also be noted in the GitHub release notes.</p>
+
+<h2>9. Contact</h2>
+<p>Questions or concerns: open an issue at
+<a href="https://github.com/nvwalj/ai-memory-reader/issues">github.com/nvwalj/ai-memory-reader/issues</a>.</p>
+
+<footer>
+<a href="./">AI Memory Reader</a> · GPL-3.0 ·
+<a href="https://github.com/nvwalj/ai-memory-reader">Source on GitHub</a>
+</footer>
+
+</div>
+
+</body>
+</html>

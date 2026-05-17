@@ -69,6 +69,17 @@ AI Memory Reader is free and open source. If it saves you time or you'd like to 
 
 Also supports opening any local folder or individual `.md` / `.json` file. Claude's JSONL telemetry files (e.g. `~/.claude/projects/*.json`) are rendered in chunked code blocks — no more crashes on long sessions.
 
+## Companion CLI: cctrack
+
+Cost tracker for the same `~/.claude/projects/*.jsonl` files AIMR renders. Walks every session, multiplies token usage by published per-M prices, prints a per-project table. Single-file Python, MIT, no deps:
+
+```bash
+pipx install cctrack   # or curl-pipe the script
+cctrack --days 7
+```
+
+→ https://github.com/nvwalj/claude-cost-tracker
+
 ## Companion: Claude Code Memory Pack
 
 AI Memory Reader is the viewer. The content sibling is [**Claude Code Memory Pack**](https://github.com/nvwalj/claude-code-memory-pack) — 8 stack-specific `CLAUDE.md` templates (Next.js, Vite+React, Node/TS, FastAPI, Python ML, Swift macOS, Swift iOS, Go), 5 lifecycle hooks, 6 slash commands, and a 5-page setup PDF. Hand-written, fully free, MIT licensed.

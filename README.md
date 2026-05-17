@@ -66,7 +66,7 @@ Also supports opening any local folder or individual .md file.
 AI Memory Reader is the viewer. If you also need the content — battle-tested `CLAUDE.md` templates, lifecycle hooks, and slash commands — see the [**Claude Code Memory Pack**](https://github.com/nvwalj/claude-code-memory-pack):
 
 - **Free preview repo** — one full example from each section (template, hook, slash command) + setup-guide TOC. MIT licensed.
-- **Full pack — $3** — 8 stack-specific templates (Next.js, Vite+React, Node/TS, FastAPI, Python ML, Swift macOS, Swift iOS, Go), 5 hooks, 6 slash commands, 12-page PDF setup guide. [Get it on Ko-fi →](https://ko-fi.com/nvwalj)
+- **Full pack — $3** — 8 stack-specific templates (Next.js, Vite+React, Node/TS, FastAPI, Python ML, Swift macOS, Swift iOS, Go), 5 hooks, 6 slash commands, 12-page PDF setup guide. [Buy now on Ko-fi →](https://ko-fi.com/s/19aebc9e5f)
 
 ## Installation
 

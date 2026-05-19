@@ -22,13 +22,21 @@ struct MacContentView: View {
     @State private var isDropTargeted = false
 
     var body: some View {
-        NavigationSplitView(columnVisibility: $columnVisibility) {
-            SidebarView()
-        } detail: {
-            DetailView()
+        VStack(spacing: 0) {
+            if case let .available(version, tag, releaseURL, notes) = UpdateChecker.shared.state {
+                UpdateBanner(version: version, tag: tag, url: releaseURL, notes: notes)
+            }
+            NavigationSplitView(columnVisibility: $columnVisibility) {
+                SidebarView()
+            } detail: {
+                DetailView()
+            }
+            .navigationSplitViewStyle(.balanced)
         }
-        .navigationSplitViewStyle(.balanced)
         .frame(minWidth: 800, minHeight: 500)
+        .task {
+            await UpdateChecker.shared.checkIfDue()
+        }
         .onAppear {
             if appState.rootNode == nil {
                 appState.restoreOrAutoSelect()

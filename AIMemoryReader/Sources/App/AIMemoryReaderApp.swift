@@ -154,6 +154,10 @@ struct AIMemoryReaderApp: App {
                     }
                 }
 
+                Button("Check for Updates…") {
+                    Task { await UpdateChecker.shared.checkManually() }
+                }
+
                 Divider()
 
                 Button("Support Development on Ko-fi…") {

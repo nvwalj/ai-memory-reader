@@ -50,6 +50,9 @@ AI Memory Reader 是免费开源软件。如果它帮你节省了时间，或者
 - **macOS** — 完整功能：侧边栏、目录大纲、编辑模式
 - **iPhone** — 只读模式，原生导航，支持从文件 App 打开
 
+### 保持最新
+- **更新提示** — 启动时（24 小时内最多一次）会向 GitHub 查询是否有新版本，发现新版会显示顶部横幅。点 "Download" 跳转到 release 页面，"Skip This Version" 屏蔽该版本，"Check for Updates…" 在 Help 菜单里。Mac App Store 版本会跳过此逻辑（系统自带更新）。
+
 ## 支持的 AI 源
 
 | AI 源 | 目录 | 关键文件 |

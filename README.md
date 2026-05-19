@@ -54,6 +54,9 @@ AI Memory Reader is free and open source. If it saves you time or you'd like to 
 - **macOS** — Full-featured with sidebar, TOC, edit mode
 - **iPhone** — Read-only with native navigation and Files app integration
 
+### Stay Current
+- **Update Notifier** — On launch (max once per 24h), the app checks GitHub for a newer release and shows a non-blocking banner. "Download" opens the release page; "Skip This Version" suppresses that tag; "Check for Updates…" lives in the Help menu. Mac App Store builds skip this entirely — Apple handles updates there.
+
 ## Supported AI Sources
 
 | AI Source | Directory | Key Files |

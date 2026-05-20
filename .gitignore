@@ -6,3 +6,8 @@ xcuserdata/
 .swiftpm/
 *.app
 build/
+
+# Internal promo / strategy drafts — never commit
+PROMO_*.md
+PRODUCT_HUNT_*.md
+SHOW_HN_*.md

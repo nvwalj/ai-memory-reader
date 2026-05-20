@@ -1,6 +1,10 @@
 import Foundation
 import SwiftUI
 
+#if os(macOS)
+import AppKit
+#endif
+
 /// Polls GitHub /releases/latest, compares against the running build's
 /// `CFBundleShortVersionString`, and exposes an `available` state that
 /// the UI can render as a banner. Mac App Store builds (sandboxed) are
@@ -23,29 +27,45 @@ final class UpdateChecker {
     private let owner = "nvwalj"
     private let repo = "ai-memory-reader"
     private let dismissedKey = "updateChecker.dismissedVersions"
-    private let lastCheckKey = "updateChecker.lastCheckAt"
-    private let checkInterval: TimeInterval = 60 * 60 * 24 // 24h
+
+    /// In-memory only: tracks whether we've already done a check in THIS app
+    /// session. Persistent throttling caused a bug where multiple installs of
+    /// AIMR sharing the same bundle ID would block each other from re-checking
+    /// — so we now always check on each launch, but skip duplicate calls within
+    /// the same process lifetime.
+    private var checkedThisSession = false
 
     private init() {}
 
-    /// Fire-and-forget startup probe. Honors the 24h throttle and
-    /// the user's "Skip This Version" history. Safe to call from .task.
+    /// Fire-and-forget startup probe. Runs on every launch (auto-check on
+    /// each app start). De-duplicates within the same session.
     func checkIfDue() async {
         #if os(macOS)
         guard !BookmarkStore.isSandboxed else { return }
         #endif
-        let now = Date()
-        if let last = UserDefaults.standard.object(forKey: lastCheckKey) as? Date,
-           now.timeIntervalSince(last) < checkInterval {
-            return
-        }
+        guard !checkedThisSession else { return }
+        checkedThisSession = true
         await performCheck(manual: false)
     }
 
-    /// Always-run check, used by the Help menu item. Ignores the throttle
-    /// but still respects dismissed-version persistence.
+    /// Always-run check, used by the Help menu item. Bypasses the in-session
+    /// dedupe. Shows feedback (alert) when up-to-date or errored so the user
+    /// knows the click worked.
     func checkManually() async {
         await performCheck(manual: true)
+        #if os(macOS)
+        switch state {
+        case .upToDate:
+            showInfoAlert(
+                title: "You're up to date",
+                message: "AI Memory Reader \(currentVersion) is the latest version."
+            )
+        case .error(let msg):
+            showInfoAlert(title: "Couldn't check for updates", message: msg)
+        default:
+            break // .available shows the banner; .checking shouldn't be terminal
+        }
+        #endif
     }
 
     /// User clicked "Skip This Version" — record the tag so we don't ask
@@ -68,7 +88,6 @@ final class UpdateChecker {
 
     private func performCheck(manual: Bool) async {
         state = .checking
-        UserDefaults.standard.set(Date(), forKey: lastCheckKey)
 
         guard let endpoint = URL(string: "https://api.github.com/repos/\(owner)/\(repo)/releases/latest") else {
             state = .error("Bad endpoint")
@@ -130,6 +149,17 @@ final class UpdateChecker {
         }
         return false
     }
+
+    #if os(macOS)
+    private func showInfoAlert(title: String, message: String) {
+        let alert = NSAlert()
+        alert.messageText = title
+        alert.informativeText = message
+        alert.alertStyle = .informational
+        alert.addButton(withTitle: "OK")
+        alert.runModal()
+    }
+    #endif
 
     private struct GitHubRelease: Decodable {
         let tag_name: String

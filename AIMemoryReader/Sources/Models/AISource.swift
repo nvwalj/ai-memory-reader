@@ -24,6 +24,13 @@ struct AISource: Identifiable, Hashable {
         if isCustom || path.hasPrefix("/") {
             return URL(fileURLWithPath: path)
         }
+        // In the App Sandbox, `homeDirectoryForCurrentUser` resolves to the
+        // sandbox *container* (~/Library/Containers/.../Data), not the real
+        // home — so paths like `.claude` would never match. Use the home the
+        // user granted via NSOpenPanel, persisted by BookmarkStore.
+        if BookmarkStore.isSandboxed, let granted = BookmarkStore.shared.userHomeURL {
+            return granted.appendingPathComponent(path)
+        }
         return FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent(path)
         #else
         // On iOS, sources aren't filesystem-based — fall back to a sentinel if the docs dir is unavailable.

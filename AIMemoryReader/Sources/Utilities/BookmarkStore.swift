@@ -43,7 +43,7 @@ final class BookmarkStore: @unchecked Sendable {
     @discardableResult
     func requestAccess(
         prompt: String = "Grant access",
-        message: String = "Choose your home folder so AI Memory Reader can read CLAUDE.md, AGENTS.md, and other AI agent memory files inside it. AIMR only reads what's in this folder — it never sends anything off your Mac.",
+        message: String = "Pick your real home folder (/Users/<your-username>) so AI Memory Reader can read CLAUDE.md, AGENTS.md, and other AI agent memory files. AIMR only reads what's in this folder — it never sends anything off your Mac.",
         startAt: URL? = nil
     ) -> URL? {
         #if os(macOS)
@@ -54,7 +54,11 @@ final class BookmarkStore: @unchecked Sendable {
         panel.canChooseFiles = false
         panel.canChooseDirectories = true
         panel.allowsMultipleSelection = false
-        panel.directoryURL = startAt ?? FileManager.default.homeDirectoryForCurrentUser
+        // Even when sandboxed, NSOpenPanel can navigate the real filesystem.
+        // `homeDirectoryForCurrentUser` returns the sandbox container — useless
+        // as a starting point. Use the real home directory instead.
+        let realHome = URL(fileURLWithPath: NSHomeDirectoryForUser(NSUserName()) ?? NSHomeDirectory())
+        panel.directoryURL = startAt ?? realHome
         guard panel.runModal() == .OK, let url = panel.url else { return nil }
         return persist(url: url) ? url : nil
         #else
@@ -103,6 +107,18 @@ final class BookmarkStore: @unchecked Sendable {
     /// Whether we have *any* active scope. The empty state in ContentView checks this
     /// to decide whether to show the "Grant access" prompt on first sandboxed launch.
     var hasAnyGrant: Bool { !activeScopes.isEmpty }
+
+    /// The granted home-style URL to use as the base for relative AI source paths
+    /// (`.claude`, `.codex`, etc.) when sandboxed. Picks the shortest-path active
+    /// scope, which is typically `/Users/<name>`. Returns nil if no grant exists.
+    ///
+    /// Falls back to `FileManager.default.homeDirectoryForCurrentUser` for the
+    /// caller — which inside the sandbox is the *container*, not the real home.
+    var userHomeURL: URL? {
+        activeScopes.values
+            .sorted { $0.path(percentEncoded: false).count < $1.path(percentEncoded: false).count }
+            .first
+    }
 
     /// Drop the bookmark for the given on-disk path. Mostly for tests / debugging.
     func revoke(path: String) {

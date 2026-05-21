@@ -1,7 +1,7 @@
 import Foundation
 
 enum FileTreeBuilder {
-    static func buildTree(at url: URL) -> FileNode {
+    static func buildTree(at url: URL, strictFiltering: Bool = true) -> FileNode {
         let fm = FileManager.default
         var isDir: ObjCBool = false
 
@@ -25,10 +25,10 @@ enum FileTreeBuilder {
                 }
                 .compactMap { childURL -> FileNode? in
                     let childIsDir = (try? childURL.resourceValues(forKeys: [.isDirectoryKey]).isDirectory) ?? false
-                    if !childIsDir && !FileNode.supportedExtensions.contains(childURL.pathExtension.lowercased()) {
+                    if !childIsDir && !FileNode.isSupportedFile(childURL, strict: strictFiltering) {
                         return nil
                     }
-                    return buildTree(at: childURL)
+                    return buildTree(at: childURL, strictFiltering: strictFiltering)
                 }
                 .filter { node in
                     // Remove empty directories

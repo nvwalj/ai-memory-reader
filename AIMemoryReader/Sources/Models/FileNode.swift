@@ -9,13 +9,21 @@ final class FileNode: Identifiable, Hashable {
     var children: [FileNode]?
     var isExpanded: Bool = false
 
-    static let supportedExtensions: Set<String> = ["md", "json"]
+    /// All file extensions that *could* be AI-related.
+    /// Used in the "show all" mode. Strict mode uses MemoryFileMatcher.
+    static let supportedExtensions: Set<String> = ["md", "mdc", "json", "jsonl", "ndjson", "yaml", "yml"]
 
-    var isMarkdown: Bool { url.pathExtension.lowercased() == "md" }
-    var isJSON: Bool { url.pathExtension.lowercased() == "json" }
+    var isMarkdown: Bool { ["md", "mdc"].contains(url.pathExtension.lowercased()) }
+    var isJSON: Bool { ["json", "jsonl", "ndjson"].contains(url.pathExtension.lowercased()) }
 
-    static func isSupportedFile(_ url: URL) -> Bool {
-        supportedExtensions.contains(url.pathExtension.lowercased())
+    /// In strict mode only known memory/config files pass.
+    /// In loose mode (default) any of `supportedExtensions` passes —
+    /// used when the user explicitly opens a file (drag-drop, picker).
+    static func isSupportedFile(_ url: URL, strict: Bool = false) -> Bool {
+        if strict {
+            return MemoryFileMatcher.isLikelyMemory(url)
+        }
+        return supportedExtensions.contains(url.pathExtension.lowercased())
     }
 
     init(url: URL, isDirectory: Bool, children: [FileNode]? = nil) {

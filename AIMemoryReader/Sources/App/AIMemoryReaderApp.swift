@@ -145,6 +145,13 @@ struct AIMemoryReaderApp: App {
                     appState.openFolder()
                 }
                 .keyboardShortcut("2", modifiers: .command)
+
+                Divider()
+
+                Toggle("Show All JSON/JSONL Files", isOn: Binding(
+                    get: { appState.showAllJsonFiles },
+                    set: { appState.showAllJsonFiles = $0 }
+                ))
             }
 
             CommandGroup(replacing: .help) {

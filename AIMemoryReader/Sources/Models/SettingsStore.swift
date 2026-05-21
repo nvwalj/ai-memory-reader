@@ -17,6 +17,7 @@ final class SettingsStore: @unchecked Sendable {
         static let lastSelectedSourceID = "lastSelectedSourceID"
         static let lastLocalFolderPath = "lastLocalFolderPath"
         static let appTheme = "appTheme"
+        static let showAllJsonFiles = "showAllJsonFiles"
     }
 
     private init() {
@@ -62,6 +63,14 @@ final class SettingsStore: @unchecked Sendable {
         set { set(newValue, forKey: Key.appTheme) }
     }
 
+    /// When true, the file tree includes any `.json`/`.jsonl`/`.yaml`/`.mdc`/etc.
+    /// When false (default), only known AI memory/config files are shown
+    /// (per `MemoryFileMatcher`). Hides noise like `package.json`.
+    var showAllJsonFiles: Bool {
+        get { bool(forKey: Key.showAllJsonFiles, default: false) }
+        set { setBool(newValue, forKey: Key.showAllJsonFiles) }
+    }
+
     // MARK: - Private read/write helpers
 
     private func string(forKey key: String) -> String? {
@@ -84,6 +93,19 @@ final class SettingsStore: @unchecked Sendable {
 
     private func set(_ value: Any?, forKey key: String) {
         // Write to both stores
+        local.set(value, forKey: key)
+        iCloud.set(value, forKey: key)
+        iCloud.synchronize()
+    }
+
+    private func bool(forKey key: String, default def: Bool) -> Bool {
+        // iCloud takes precedence if set
+        if iCloud.object(forKey: key) != nil { return iCloud.bool(forKey: key) }
+        if local.object(forKey: key) != nil { return local.bool(forKey: key) }
+        return def
+    }
+
+    private func setBool(_ value: Bool, forKey key: String) {
         local.set(value, forKey: key)
         iCloud.set(value, forKey: key)
         iCloud.synchronize()

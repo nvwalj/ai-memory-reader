@@ -36,6 +36,16 @@ final class AppState {
         }
     }
 
+    /// Toggle in View menu. When false (default), only known AI memory files show.
+    /// When true, every .json/.jsonl/.md/.mdc/.yaml under the source is listed.
+    var showAllJsonFiles: Bool = false {
+        didSet {
+            guard oldValue != showAllJsonFiles else { return }
+            SettingsStore.shared.showAllJsonFiles = showAllJsonFiles
+            rebuildCurrentTree()
+        }
+    }
+
     // MARK: - In-page Find
 
     /// Pulsed to request the Detail view open its find-in-file bar.
@@ -72,6 +82,7 @@ final class AppState {
            let saved = AppTheme(rawValue: raw) {
             appTheme = saved
         }
+        showAllJsonFiles = SettingsStore.shared.showAllJsonFiles
     }
 
     /// True for sandboxed (Mac App Store) builds that haven't yet been granted
@@ -254,10 +265,24 @@ final class AppState {
 
     func loadDirectory(_ url: URL) {
         rootURL = url
-        rootNode = FileTreeBuilder.buildTree(at: url)
+        rootNode = FileTreeBuilder.buildTree(at: url, strictFiltering: !showAllJsonFiles)
         rootNode?.isExpanded = true
         selectedFile = nil
         todayFileNode = nil
+    }
+
+    /// Rebuild the current tree using the current filter mode. Preserves
+    /// expanded directories and the selected file when possible.
+    func rebuildCurrentTree() {
+        guard let rootURL else { return }
+        let prevSelectedURL = selectedFile?.url
+        let expandedPaths = collectExpandedPaths(rootNode)
+        rootNode = FileTreeBuilder.buildTree(at: rootURL, strictFiltering: !showAllJsonFiles)
+        rootNode?.isExpanded = true
+        restoreExpandedPaths(expandedPaths, in: rootNode)
+        if let prev = prevSelectedURL, let node = findNode(url: prev, in: rootNode) {
+            selectedFile = node
+        }
     }
 
     // MARK: - URL Scheme
@@ -407,7 +432,7 @@ final class AppState {
         let expandedPaths = collectExpandedPaths(rootNode)
 
         // Rebuild file tree
-        rootNode = FileTreeBuilder.buildTree(at: rootURL)
+        rootNode = FileTreeBuilder.buildTree(at: rootURL, strictFiltering: !showAllJsonFiles)
         rootNode?.isExpanded = true
 
         // Restore expanded directories

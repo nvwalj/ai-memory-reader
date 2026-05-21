@@ -20,13 +20,14 @@ Why I think it fits your criteria:
 - **Part of the regular dev cycle.** AI coding assistants are writing memory files constantly. AIMR refreshes live as Claude writes.
 - **Power-user features.** GitHub-style markdown, ⌘F find with character highlighting, ⌘E inline edit, JSON/JSONL viewer for Claude session telemetry, URL scheme + `aimr` CLI + Claude Code `/aimr` slash command, dark mode.
 - **Quality.** Swift + SwiftUI, no Electron. Universal binary. Recently passed an internal security audit (privacy manifest shipped, zero network calls).
-- **Active.** v0.4.2 shipped two days ago (May 17, 2026). v0.4.0 → v0.4.2 in one day after addressing audit feedback.
-- **Pre-1.0** — currently 0.4.2, which fits your beta/preview criteria.
+- **Active.** v0.4.5 shipped May 20, 2026 — 6 releases in 5 days since launch (v0.4.0 → v0.4.5), iterating on audit feedback and adding an in-app update notifier.
+- **Pre-1.0** — currently 0.4.5, which fits your beta/preview criteria.
 
 Links:
 - Repo + README: https://github.com/nvwalj/ai-memory-reader
 - Landing page: https://nvwalj.github.io/ai-memory-reader/
-- Latest release: https://github.com/nvwalj/ai-memory-reader/releases/tag/v0.4.2
+- Latest release (auto-redirects to current): https://github.com/nvwalj/ai-memory-reader/releases/latest
+- Direct download: https://github.com/nvwalj/ai-memory-reader/releases/latest/download/AIMemoryReader.zip
 - Screenshot: https://github.com/nvwalj/ai-memory-reader/blob/main/home.png
 
 Happy to answer anything. Thanks for considering.
@@ -46,7 +47,7 @@ Quick tool pitch for TLDR Dev: **AI Memory Reader** — a 3 MB native macOS app 
 
 Why now: AI coding assistants are writing structured memory files into every project, and most devs are opening them one at a time in TextEdit. AIMR auto-discovers them, watches for live writes, and renders GitHub-style markdown.
 
-Free, open source, no telemetry, no signup. Pre-1.0 (v0.4.2). Built in Swift + SwiftUI.
+Free, open source, no telemetry, no signup. Pre-1.0 (v0.4.5). Built in Swift + SwiftUI.
 
 - Repo: https://github.com/nvwalj/ai-memory-reader
 - Landing: https://nvwalj.github.io/ai-memory-reader/

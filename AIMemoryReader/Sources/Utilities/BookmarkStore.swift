@@ -32,7 +32,13 @@ final class BookmarkStore: @unchecked Sendable {
     /// Stopping accesses is handled by `stopAllAccess()` (typically at app shutdown).
     private var activeScopes: [String: URL] = [:]
 
-    private init() {}
+    private init() {
+        // Restore bookmarks eagerly so any code path that hits
+        // BookmarkStore.shared after this point sees the active scopes.
+        // (AppState.init reads sources before AppDelegate's
+        // applicationWillFinishLaunching would otherwise have fired.)
+        restoreOnLaunch()
+    }
 
     // MARK: - Public API
 

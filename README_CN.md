@@ -21,6 +21,8 @@ AI Memory Reader 是免费开源软件。如果它帮你节省了时间，或者
 ### 阅读
 - **精美 Markdown 渲染** — GitHub 风格，支持代码块、表格、列表等（基于 MarkdownUI）
 - **自动发现 AI 源** — 自动检测 OpenClaw、Claude Code、Codex、Gemini、Continue、Cursor、Aider、GitHub Copilot 等 AI 工具目录
+- **JSON / JSONL 浏览器** — 美化渲染 Claude 和 Codex 的 session telemetry (`~/.claude/projects/*.jsonl`, `~/.codex/sessions/**/*.jsonl`)，分块加载处理多 MB 文件
+- **严格 memory 文件过滤** — 默认只显示已知的 AI memory/config 文件（markdown、JSONL session 日志、已知的 config 文件名）。`package.json`、`tsconfig.json` 等噪音文件不再出现。需要看全部时菜单 View → "Show All JSON/JSONL Files" 切换
 - **Today 面板** — 自动高亮今天的记忆文件
 - **文件树导航** — 侧边栏可展开的文件目录
 - **目录大纲** — 右侧 TOC 面板，点击跳转对应标题
@@ -56,13 +58,13 @@ AI Memory Reader 是免费开源软件。如果它帮你节省了时间，或者
 
 | AI 源 | 目录 | 关键文件 |
 |-------|------|---------|
-| Claude Code | `~/.claude/` | CLAUDE.md, memory/*.md，以及项目树里的 `CLAUDE.md` |
-| Codex | `~/.codex/` | AGENTS.md, instructions.md |
+| Claude Code | `~/.claude/` | CLAUDE.md, memory/*.md, projects/**/*.jsonl，以及项目树里的 `CLAUDE.md` |
+| Codex | `~/.codex/` | AGENTS.md, memories/*.md, sessions/**/*.jsonl |
 | Gemini | `~/.gemini/` | GEMINI.md |
-| Cursor | `~/.cursor/` | rules |
-| Continue | `~/.continue/` | config.md |
-| GitHub Copilot | `~/.config/github-copilot/` | 配置文件 |
-| Aider | `~/.aider/` | 配置文件 |
+| Cursor | `~/.cursor/` | rules/*.mdc |
+| Continue | `~/.continue/` | config.json, config.yaml, rules/*.md |
+| GitHub Copilot | `~/.config/github-copilot/` | copilot-instructions.md |
+| Aider | `~/.aider/` | .aider.conf.yml, CONVENTIONS.md |
 | OpenClaw | `~/.openclaw/workspace/` | MEMORY.md, SOUL.md, AGENTS.md, memory/*.md |
 
 仅显示本机上实际存在且包含 .md 文件的目录。也支持手动打开任意本地文件夹或单个 .md 文件。

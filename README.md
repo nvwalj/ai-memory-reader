@@ -29,7 +29,8 @@ AI Memory Reader is free and open source. If it saves you time or you'd like to 
 ### Reading
 - **Beautiful Markdown Rendering** — GitHub-style with code blocks, tables, lists, and more (powered by MarkdownUI)
 - **Auto-Discover AI Sources** — Automatically detects Claude Code, Codex, Gemini, Cursor, Continue, GitHub Copilot, Aider, and OpenClaw memory directories
-- **JSON / JSONL Viewer** — Pretty-prints Claude's session telemetry files (`~/.claude/projects/*.json`) with chunked rendering to handle multi-MB transcripts
+- **JSON / JSONL Viewer** — Pretty-prints Claude's and Codex's session telemetry (`~/.claude/projects/*.jsonl`, `~/.codex/sessions/**/*.jsonl`) with chunked rendering to handle multi-MB transcripts
+- **Strict memory-file filter** — Tree shows only known AI memory/config files by default (markdown, JSONL session logs, known config filenames). Hides noise like `package.json`, `tsconfig.json`. Flip View → "Show All JSON/JSONL Files" to see everything.
 - **Today Panel** — Highlights today's memory file for quick access
 - **File Tree Navigation** — Browse markdown files with an expandable sidebar
 - **Table of Contents** — Right sidebar TOC with click-to-jump navigation
@@ -60,13 +61,13 @@ AI Memory Reader is free and open source. If it saves you time or you'd like to 
 
 | AI Source | Directory | Key Files |
 |-----------|-----------|-----------|
-| Claude Code | `~/.claude/` | CLAUDE.md, memory/*.md, plus `CLAUDE.md` files in project trees |
-| Codex | `~/.codex/` | AGENTS.md, instructions.md |
+| Claude Code | `~/.claude/` | CLAUDE.md, memory/*.md, projects/**/*.jsonl, plus `CLAUDE.md` files in project trees |
+| Codex | `~/.codex/` | AGENTS.md, memories/*.md, sessions/**/*.jsonl |
 | Gemini | `~/.gemini/` | GEMINI.md |
-| Cursor | `~/.cursor/` | rules |
-| Continue | `~/.continue/` | config.md |
-| GitHub Copilot | `~/.config/github-copilot/` | config files |
-| Aider | `~/.aider/` | config files |
+| Cursor | `~/.cursor/` | rules/*.mdc |
+| Continue | `~/.continue/` | config.json, config.yaml, rules/*.md |
+| GitHub Copilot | `~/.config/github-copilot/` | copilot-instructions.md |
+| Aider | `~/.aider/` | .aider.conf.yml, CONVENTIONS.md |
 | OpenClaw | `~/.openclaw/workspace/` | MEMORY.md, SOUL.md, AGENTS.md, memory/*.md |
 
 Also supports opening any local folder or individual `.md` / `.json` file. Claude's JSONL telemetry files (e.g. `~/.claude/projects/*.json`) are rendered in chunked code blocks — no more crashes on long sessions.

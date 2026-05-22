@@ -12,9 +12,15 @@
 
 ## ❤️ 支持本项目
 
-AI Memory Reader 是免费开源软件。如果它帮你节省了时间，或者你希望看到它继续演进，欢迎到 **[Ko-fi ↗](https://ko-fi.com/nvwalj)** 请作者喝杯咖啡 —— 每一杯都会变成新的功能。
+AI Memory Reader 是免费开源软件。三种支持方式：
+
+**☕ 到 Ko-fi 请作者喝咖啡** — 一次性打赏，无需注册：
 
 <a href='https://ko-fi.com/nvwalj' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://storage.ko-fi.com/cdn/kofi5.png?v=3' border='0' alt='在 Ko-fi 上请作者喝咖啡' /></a>
+
+**⭐ 给项目点 Star** — 真的有用。GitHub Star 数是新用户判断要不要装的首要信号。
+
+**🏢 团队 / 企业咨询** — 5 人以上团队想要梳理 AI memory 工作流（CLAUDE.md 层级、JSONL session 排查、多仓共享 memory）？我提供付费咨询：典型一次 1 小时 Zoom + 一份针对你技术栈定制的 CLAUDE.md 模板，$200–500。邮件 **nvwalj@gmail.com**，附上团队规模 + 技术栈。
 
 ## 功能特性
 

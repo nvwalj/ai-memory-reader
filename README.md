@@ -20,9 +20,15 @@ This project ships an [`llms.txt`](llms.txt) file with a machine-readable summar
 
 ## ❤️ Support This Project
 
-AI Memory Reader is free and open source. If it saves you time or you'd like to see it evolve, please consider supporting development on **[Ko-fi ↗](https://ko-fi.com/nvwalj)** — every coffee fuels new features.
+AI Memory Reader is free and open source. Three ways to support development:
+
+**☕ Buy me a coffee on Ko-fi** — one-time tip, no signup needed:
 
 <a href='https://ko-fi.com/nvwalj' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://storage.ko-fi.com/cdn/kofi5.png?v=3' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
+
+**⭐ Star this repo** — it actually matters; GitHub stars are the #1 signal new users use to decide whether to install.
+
+**🏢 Team / enterprise setup help** — Helping a 5+ person team set up AI memory workflows (CLAUDE.md hierarchy, JSONL session telemetry triage, multi-repo memory sharing)? I do paid consulting — typically $200–500 for a 1-hour Zoom + a custom CLAUDE.md template tuned to your stack. Email **nvwalj@gmail.com** with your team size + tech stack.
 
 ## Features
 

@@ -11,9 +11,9 @@ final class FileNode: Identifiable, Hashable {
 
     /// All file extensions that *could* be AI-related.
     /// Used in the "show all" mode. Strict mode uses MemoryFileMatcher.
-    static let supportedExtensions: Set<String> = ["md", "mdc", "json", "jsonl", "ndjson", "yaml", "yml"]
+    static let supportedExtensions: Set<String> = ["md", "mdx", "mdc", "json", "jsonl", "ndjson", "yaml", "yml"]
 
-    var isMarkdown: Bool { ["md", "mdc"].contains(url.pathExtension.lowercased()) }
+    var isMarkdown: Bool { ["md", "mdx", "mdc"].contains(url.pathExtension.lowercased()) }
     var isJSON: Bool { ["json", "jsonl", "ndjson"].contains(url.pathExtension.lowercased()) }
 
     /// In strict mode only known memory/config files pass.

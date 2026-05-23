@@ -49,6 +49,9 @@ struct MacContentView: View {
             handleDrop(providers)
             return true
         }
+        .sheet(isPresented: Bindable(appState).showSuggestedRulesSheet) {
+            SuggestedRulesView()
+        }
     }
 
     private func handleDrop(_ providers: [NSItemProvider]) {

@@ -164,6 +164,33 @@ struct SidebarView: View {
                     .padding(.horizontal, 16)
                     .padding(.vertical, 4)
             }
+
+            // Suggested Rules entry
+            if appState.selectedSourceID != nil,
+               !appState.availableSources.isEmpty {
+                Divider()
+                    .padding(.horizontal, 16)
+                    .padding(.top, 4)
+                HStack(spacing: 8) {
+                    Image(systemName: "sparkles")
+                        .font(.system(size: 14))
+                        .foregroundColor(.accentColor)
+                        .frame(width: 22)
+                    Text("Suggested Rules")
+                        .font(.system(size: 13))
+                    Spacer()
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 6)
+                .contentShape(Rectangle())
+                .background(Color.clear)
+                .clipShape(RoundedRectangle(cornerRadius: 6))
+                .padding(.horizontal, 8)
+                .onTapGesture {
+                    appState.showSuggestedRulesSheet = true
+                }
+                .help("Find repeated corrections worth promoting to CLAUDE.md")
+            }
         }
         .padding(.bottom, 8)
     }

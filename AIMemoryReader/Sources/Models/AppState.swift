@@ -63,6 +63,12 @@ final class AppState {
     /// Incremented on each file-system change so views can react
     var fileChangeToken: Int = 0
 
+    // MARK: - Suggested Rules (v0.5)
+    /// Cached scan results, sorted by frequency desc.
+    var suggestedRules: [RuleSuggestion] = []
+    /// Controls the Suggested Rules sheet visibility.
+    var showSuggestedRulesSheet: Bool = false
+
     // MARK: - Recent Folders
 
     var recentFolders: [String] {

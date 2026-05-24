@@ -132,6 +132,20 @@ extension AISource {
             color: .orange,
             path: ".openclaw/workspace"
         ),
+        AISource(
+            id: "qwen",
+            name: "Qwen Code",
+            iconName: "terminal",
+            color: Color(red: 0.96, green: 0.39, blue: 0.16),
+            path: ".qwen"
+        ),
+        AISource(
+            id: "kimi",
+            name: "Kimi CLI",
+            iconName: "terminal",
+            color: Color(red: 0.0, green: 0.42, blue: 0.86),
+            path: ".kimi"
+        ),
     ]
 
     /// Detect auto-discovered sources that exist and contain supported files

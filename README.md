@@ -30,7 +30,7 @@ AI Memory Reader is free and open source. Three ways to support development:
 
 **⭐ Star this repo** — it actually matters; GitHub stars are the #1 signal new users use to decide whether to install.
 
-**🏢 Team / enterprise setup help** — Helping a 5+ person team set up AI memory workflows (CLAUDE.md hierarchy, JSONL session telemetry triage, multi-repo memory sharing)? I do paid consulting — typically $200–500 for a 1-hour Zoom + a custom CLAUDE.md template tuned to your stack. Email **nvwalj@gmail.com** with your team size + tech stack.
+**🏢 Need a CLAUDE.md audit?** — A 90-minute review of your team's Claude Code setup — file hierarchy, agent rules, session telemetry, the three habits eating your tokens. Written diagnosis + rewritten root `CLAUDE.md` + five templates. $299 solo · $799 team of 2–10. [See what's included →](https://bestagent.dev/audit)
 
 ## Features
 

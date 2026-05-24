@@ -22,7 +22,7 @@ AI Memory Reader 是免费开源软件。三种支持方式：
 
 **⭐ 给项目点 Star** — 真的有用。GitHub Star 数是新用户判断要不要装的首要信号。
 
-**🏢 团队 / 企业咨询** — 5 人以上团队想要梳理 AI memory 工作流（CLAUDE.md 层级、JSONL session 排查、多仓共享 memory）？我提供付费咨询：典型一次 1 小时 Zoom + 一份针对你技术栈定制的 CLAUDE.md 模板，$200–500。邮件 **nvwalj@gmail.com**，附上团队规模 + 技术栈。
+**🏢 需要 CLAUDE.md 审计？** — 90 分钟 Zoom 一对一审计：文件层级、agent 规则、JSONL session 痛点、3 个让你 token 翻倍的坏习惯。交付：诊断报告 + 重写后的根 `CLAUDE.md` + 5 个可复用模板。$299 个人 · $799 2-10 人团队。[查看包含内容 →](https://bestagent.dev/audit)
 
 ## 功能特性
 

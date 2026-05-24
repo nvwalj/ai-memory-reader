@@ -7,6 +7,8 @@
 [![Platforms](https://img.shields.io/badge/平台-macOS%2015%20%7C%20iOS%2017-lightgrey.svg)]()
 
 > 原生 Swift + SwiftUI，3 MB 通用二进制，零网络请求（除一次/天的 GitHub release 检查，可关）。iPhone 版只读。
+>
+> 同一作者另一项目：**[bestagent.dev](https://bestagent.dev)** — Claude Code、Codex、Cursor 等 AI 编程工具的独立实测点评。
 
 ![AI Memory Reader](home.png)
 

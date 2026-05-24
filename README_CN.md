@@ -1,6 +1,6 @@
 # AI Memory Reader
 
-一款原生 macOS 浏览器，专门用来看你的 AI 智能体在硬盘上偷偷写下的所有内容：`CLAUDE.md`、`AGENTS.md`、每日 memory 笔记、以及 `~/.claude/projects/*.jsonl` session telemetry。自动发现 8 个 AI 工具的目录（Claude Code、Codex、Cursor、Gemini、Continue、GitHub Copilot、Aider、OpenClaw），实时监听文件变化，分块渲染让 VSCode 卡死的 multi-MB JSONL。
+一款原生 macOS 浏览器，专门用来看你的 AI 智能体在硬盘上偷偷写下的所有内容：`CLAUDE.md`、`AGENTS.md`、每日 memory 笔记、以及 `~/.claude/projects/*.jsonl` session telemetry。自动发现 10 个 AI 工具的目录（Claude Code、Codex、Cursor、Gemini、Continue、GitHub Copilot、Aider、OpenClaw、Qwen Code、Kimi CLI），实时监听文件变化，分块渲染让 VSCode 卡死的 multi-MB JSONL。
 
 [![Ko-fi](https://img.shields.io/badge/赞助-Ko--fi-FF5E5B?logo=ko-fi&logoColor=white)](https://ko-fi.com/nvwalj)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
@@ -26,7 +26,7 @@ AI Memory Reader 是免费开源软件。三种支持方式：
 
 ### 阅读
 - **精美 Markdown 渲染** — GitHub 风格，支持代码块、表格、列表等（基于 MarkdownUI）
-- **自动发现 AI 源** — 自动检测 OpenClaw、Claude Code、Codex、Gemini、Continue、Cursor、Aider、GitHub Copilot 等 AI 工具目录
+- **自动发现 AI 源** — 自动检测 Claude Code、Codex、Gemini、Continue、Cursor、Aider、GitHub Copilot、OpenClaw、Qwen Code、Kimi CLI 等 AI 工具目录
 - **JSON / JSONL 浏览器** — 美化渲染 Claude 和 Codex 的 session telemetry (`~/.claude/projects/*.jsonl`, `~/.codex/sessions/**/*.jsonl`)，分块加载处理多 MB 文件
 - **严格 memory 文件过滤** — 默认只显示已知的 AI memory/config 文件（markdown、JSONL session 日志、已知的 config 文件名）。`package.json`、`tsconfig.json` 等噪音文件不再出现。需要看全部时菜单 View → "Show All JSON/JSONL Files" 切换
 - **Today 面板** — 自动高亮今天的记忆文件
@@ -72,6 +72,8 @@ AI Memory Reader 是免费开源软件。三种支持方式：
 | GitHub Copilot | `~/.config/github-copilot/` | copilot-instructions.md |
 | Aider | `~/.aider/` | .aider.conf.yml, CONVENTIONS.md |
 | OpenClaw | `~/.openclaw/workspace/` | MEMORY.md, SOUL.md, AGENTS.md, memory/*.md |
+| Qwen Code（阿里通义） | `~/.qwen/` | settings.json, AGENTS.md, sessions/**/*.jsonl |
+| Kimi CLI（月之暗面） | `~/.kimi/` | config.toml, AGENTS.md, sessions/**/*.jsonl |
 
 仅显示本机上实际存在且包含 .md 文件的目录。也支持手动打开任意本地文件夹或单个 .md 文件。
 

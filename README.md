@@ -2,7 +2,7 @@
 
 [中文文档](README_CN.md)
 
-The native macOS viewer for every `CLAUDE.md`, `AGENTS.md`, daily memory entry, and `~/.claude/projects/*.jsonl` session transcript your AI agents leave on disk. Auto-discovers 8 supported agents (Claude Code, Codex, Cursor, Gemini, Continue, GitHub Copilot, Aider, OpenClaw), watches files live as agents write, and chunk-renders multi-MB JSONL telemetry that crashes VSCode.
+The native macOS viewer for every `CLAUDE.md`, `AGENTS.md`, daily memory entry, and `~/.claude/projects/*.jsonl` session transcript your AI agents leave on disk. Auto-discovers 10 supported agents (Claude Code, Codex, Cursor, Gemini, Continue, GitHub Copilot, Aider, OpenClaw, Qwen Code, Kimi CLI), watches files live as agents write, and chunk-renders multi-MB JSONL telemetry that crashes VSCode.
 
 [![Ko-fi](https://img.shields.io/badge/Support%20on-Ko--fi-FF5E5B?logo=ko-fi&logoColor=white)](https://ko-fi.com/nvwalj)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
@@ -34,7 +34,7 @@ AI Memory Reader is free and open source. Three ways to support development:
 
 ### Reading
 - **Beautiful Markdown Rendering** — GitHub-style with code blocks, tables, lists, and more (powered by MarkdownUI)
-- **Auto-Discover AI Sources** — Automatically detects Claude Code, Codex, Gemini, Cursor, Continue, GitHub Copilot, Aider, and OpenClaw memory directories
+- **Auto-Discover AI Sources** — Automatically detects Claude Code, Codex, Gemini, Cursor, Continue, GitHub Copilot, Aider, OpenClaw, Qwen Code, and Kimi CLI memory directories
 - **JSON / JSONL Viewer** — Pretty-prints Claude's and Codex's session telemetry (`~/.claude/projects/*.jsonl`, `~/.codex/sessions/**/*.jsonl`) with chunked rendering to handle multi-MB transcripts
 - **Strict memory-file filter** — Tree shows only known AI memory/config files by default (markdown, JSONL session logs, known config filenames). Hides noise like `package.json`, `tsconfig.json`. Flip View → "Show All JSON/JSONL Files" to see everything.
 - **Today Panel** — Highlights today's memory file for quick access
@@ -75,6 +75,8 @@ AI Memory Reader is free and open source. Three ways to support development:
 | GitHub Copilot | `~/.config/github-copilot/` | copilot-instructions.md |
 | Aider | `~/.aider/` | .aider.conf.yml, CONVENTIONS.md |
 | OpenClaw | `~/.openclaw/workspace/` | MEMORY.md, SOUL.md, AGENTS.md, memory/*.md |
+| Qwen Code | `~/.qwen/` | settings.json, AGENTS.md, sessions/**/*.jsonl |
+| Kimi CLI | `~/.kimi/` | config.toml, AGENTS.md, sessions/**/*.jsonl |
 
 Also supports opening any local folder or individual `.md` / `.json` file. Claude's JSONL telemetry files (e.g. `~/.claude/projects/*.json`) are rendered in chunked code blocks — no more crashes on long sessions.
 

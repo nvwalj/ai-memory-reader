@@ -3,6 +3,25 @@
 All notable changes to AI Memory Reader. Full release notes and downloads:
 https://github.com/nvwalj/ai-memory-reader/releases
 
+## v0.4.10 — 2026-06-03
+
+**Fixed sidebar selection flicker / ghost highlight boxes.**
+
+- The file-tree List carried `.id(fileChangeToken)`, so every filesystem event
+  (recursive FSEvents) tore down and rebuilt the entire List — constantly on a
+  live source like `~/.claude` where agents write session files. The recreation
+  dropped first-responder (the selection redrew inactive-gray) and, colliding
+  with the `selectedFile` object swap in `handleFileSystemChange`, left **ghost
+  selection boxes** stuck on previously-selected rows.
+- Fix: the tree is now reconciled **in place** (`FileTreeBuilder.merge`) — existing
+  `FileNode` objects are reused wherever the path matches, so the List, its
+  selection, expansion state, and scroll position survive filesystem events; only
+  genuine file adds/removes mutate the tree. Removed `.id(fileChangeToken)` and the
+  now-unused expand-path snapshot helpers. The detail view's content auto-reload
+  (driven by `fileChangeToken`) is unchanged.
+- Note: a selected row still greys when the sidebar loses focus — that is standard
+  macOS inactive-selection behavior, not the bug that was fixed.
+
 ## v0.4.9 — 2026-06-02
 
 **Faster launch.**

@@ -48,7 +48,6 @@ struct SidebarView: View {
                 }
                 .listStyle(.sidebar)
                 .scrollContentBackground(palette.isEyeCare ? .hidden : .automatic)
-                .id(appState.fileChangeToken)
             } else {
                 emptyState
             }

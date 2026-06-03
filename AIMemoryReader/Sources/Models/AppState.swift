@@ -316,13 +316,14 @@ final class AppState {
     /// expanded directories and the selected file when possible.
     func rebuildCurrentTree() {
         guard let rootURL else { return }
-        let prevSelectedURL = selectedFile?.url
-        let expandedPaths = collectExpandedPaths(rootNode)
-        rootNode = FileTreeBuilder.buildTree(at: rootURL, strictFiltering: !showAllJsonFiles)
-        rootNode?.isExpanded = true
-        restoreExpandedPaths(expandedPaths, in: rootNode)
-        if let prev = prevSelectedURL, let node = findNode(url: prev, in: rootNode) {
-            selectedFile = node
+        let fresh = FileTreeBuilder.buildTree(at: rootURL, strictFiltering: !showAllJsonFiles)
+        if let existing = rootNode {
+            // In-place reconcile (see handleFileSystemChange) — the show-all toggle
+            // adds/removes many files but keeps expansion and selection stable.
+            FileTreeBuilder.merge(into: existing, from: fresh)
+        } else {
+            rootNode = fresh
+            rootNode?.isExpanded = true
         }
     }
 
@@ -438,56 +439,25 @@ final class AppState {
         #endif
     }
 
-    // Pure FileNode tree helpers — cross-platform (used by rebuildCurrentTree
-    // on all platforms, and by handleFileSystemChange on macOS).
-    private func collectExpandedPaths(_ node: FileNode?) -> Set<String> {
-        guard let node else { return [] }
-        var paths = Set<String>()
-        if node.isDirectory && node.isExpanded {
-            paths.insert(node.id)
-        }
-        for child in node.children ?? [] {
-            paths.formUnion(collectExpandedPaths(child))
-        }
-        return paths
-    }
-
-    private func restoreExpandedPaths(_ paths: Set<String>, in node: FileNode?) {
-        guard let node else { return }
-        if node.isDirectory && paths.contains(node.id) {
-            node.isExpanded = true
-        }
-        for child in node.children ?? [] {
-            restoreExpandedPaths(paths, in: child)
-        }
-    }
-
     #if os(macOS)
     private func handleFileSystemChange() {
-        print("[AppState] handleFileSystemChange triggered")
-        guard let rootURL else {
-            print("[AppState] rootURL is nil, skipping refresh")
-            return
+        guard let rootURL else { return }
+
+        let fresh = FileTreeBuilder.buildTree(at: rootURL, strictFiltering: !showAllJsonFiles)
+        if let existing = rootNode {
+            // Reconcile in place: reuse existing FileNode objects where paths match,
+            // so the sidebar List — and its selection, expansion, and scroll — is
+            // never torn down on a filesystem event. Only genuine adds/removes mutate
+            // the tree. (Previously this replaced rootNode wholesale and the List was
+            // force-recreated via `.id(fileChangeToken)`, which caused selection
+            // flicker and ghost highlights on busy sources like ~/.claude.)
+            FileTreeBuilder.merge(into: existing, from: fresh)
+        } else {
+            rootNode = fresh
+            rootNode?.isExpanded = true
         }
 
-        // Remember current state
-        let previousSelectedURL = selectedFile?.url
-        let expandedPaths = collectExpandedPaths(rootNode)
-
-        // Rebuild file tree
-        rootNode = FileTreeBuilder.buildTree(at: rootURL, strictFiltering: !showAllJsonFiles)
-        rootNode?.isExpanded = true
-
-        // Restore expanded directories
-        restoreExpandedPaths(expandedPaths, in: rootNode)
-
-        // Restore selection
-        if let prevURL = previousSelectedURL,
-           let node = findNode(url: prevURL, in: rootNode) {
-            selectedFile = node
-        }
-
-        // Increment change token so detail view can reload
+        // Tell the detail view to reload the open file's content from disk.
         fileChangeToken += 1
     }
     #endif

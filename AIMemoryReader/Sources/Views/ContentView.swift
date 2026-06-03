@@ -37,10 +37,10 @@ struct MacContentView: View {
         .task {
             await UpdateChecker.shared.checkIfDue()
         }
-        .onAppear {
-            if appState.rootNode == nil {
-                appState.restoreOrAutoSelect()
-            }
+        .task {
+            // Detect AI sources off the main thread so launch (and the
+            // double-click-a-file fast path) isn't blocked by directory scans.
+            await appState.detectSourcesIfNeeded()
         }
         .onChange(of: appState.isSingleFileMode) { _, isSingle in
             columnVisibility = isSingle ? .detailOnly : .automatic
@@ -141,10 +141,8 @@ struct iOSContentView: View {
                     }
                 }
         }
-        .onAppear {
-            if appState.rootNode == nil {
-                appState.restoreOrAutoSelect()
-            }
+        .task {
+            await appState.detectSourcesIfNeeded()
         }
     }
 }

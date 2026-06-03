@@ -12,6 +12,13 @@ final class AppState {
     var isSingleFileMode: Bool = false
 
     var availableSources: [AISource] = []
+
+    /// True until the first asynchronous source detection finishes. Used to
+    /// suppress the "grant access" empty state from flashing before detection
+    /// has had a chance to populate `availableSources`.
+    var isDetectingSources: Bool = true
+    private var didStartDetection = false
+
     var selectedSourceID: String? {
         didSet {
             SettingsStore.shared.lastSelectedSourceID = selectedSourceID
@@ -82,7 +89,12 @@ final class AppState {
     var pendingURLHeading: String?
 
     init() {
-        availableSources = AISource.detectAllAvailable()
+        // NOTE: source detection is deliberately NOT done here. Scanning the
+        // candidate directories (a large ~/.claude can hold thousands of session
+        // files) is slow, and doing it synchronously in init blocks app launch —
+        // including the fast path where the user just double-clicked a single
+        // .md file. Detection runs off the main thread via `detectSourcesIfNeeded()`,
+        // called from the view's `.task` once the window is on screen.
         selectedSourceID = SettingsStore.shared.lastSelectedSourceID
         if let raw = SettingsStore.shared.appThemeRaw,
            let saved = AppTheme(rawValue: raw) {
@@ -91,12 +103,35 @@ final class AppState {
         showAllJsonFiles = SettingsStore.shared.showAllJsonFiles
     }
 
+    /// Detect available sources off the main thread, then — only on a normal
+    /// launch where no file was opened directly — auto-select the saved or first
+    /// source. Runs at most once; safe to call from the view's `.task`.
+    func detectSourcesIfNeeded() async {
+        guard !didStartDetection else { return }
+        didStartDetection = true
+
+        // Run the filesystem scan off the main actor so launch isn't blocked.
+        let detected = await Task.detached(priority: .userInitiated) {
+            AISource.detectAllAvailable()
+        }.value
+
+        availableSources = detected
+        isDetectingSources = false
+
+        // If a file was opened directly (double-click / drag / URL scheme), it
+        // already populated `rootNode` — don't override it with a default source.
+        if rootNode == nil && !isSingleFileMode {
+            restoreOrAutoSelect()
+        }
+    }
+
     /// True for sandboxed (Mac App Store) builds that haven't yet been granted
     /// access to a host folder. SidebarView shows a "Grant access" empty state in
     /// this case. Always false for the direct-distribution build.
     var needsSandboxGrant: Bool {
         #if os(macOS)
-        return BookmarkStore.isSandboxed
+        return !isDetectingSources
+            && BookmarkStore.isSandboxed
             && !BookmarkStore.shared.hasAnyGrant
             && availableSources.isEmpty
         #else
@@ -403,7 +438,8 @@ final class AppState {
         #endif
     }
 
-    #if os(macOS)
+    // Pure FileNode tree helpers — cross-platform (used by rebuildCurrentTree
+    // on all platforms, and by handleFileSystemChange on macOS).
     private func collectExpandedPaths(_ node: FileNode?) -> Set<String> {
         guard let node else { return [] }
         var paths = Set<String>()
@@ -426,6 +462,7 @@ final class AppState {
         }
     }
 
+    #if os(macOS)
     private func handleFileSystemChange() {
         print("[AppState] handleFileSystemChange triggered")
         guard let rootURL else {

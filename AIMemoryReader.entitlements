@@ -16,9 +16,8 @@
 	<key>com.apple.security.files.bookmarks.document-scope</key>
 	<true/>
 
-	<!-- iCloud key-value store for SettingsStore.shared sync (custom AI source paths, theme). -->
-	<key>com.apple.developer.ubiquity-kvstore-identifier</key>
-	<string>$(TeamIdentifierPrefix)$(CFBundleIdentifier)</string>
+	<!-- iCloud KV-store removed for MAS v1 submission — re-enable after adding
+	     the iCloud Services capability to the App ID in developer.apple.com. -->
 
 	<!-- No network access. AIMR is local-only by design. -->
 	<!-- No camera, microphone, location, contacts, calendar, photos. -->

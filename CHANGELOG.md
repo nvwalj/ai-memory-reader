@@ -3,6 +3,20 @@
 All notable changes to AI Memory Reader. Full release notes and downloads:
 https://github.com/nvwalj/ai-memory-reader/releases
 
+## v0.4.13 — 2026-06-10
+
+**Fixed "Check for Updates" failing with a hostname error.**
+
+- The v0.4.11 and v0.4.12 GitHub zips were accidentally built with the Mac App
+  Store sandbox profile, which has no network permission — so the update
+  checker couldn't reach api.github.com and reported "A server with the
+  specified hostname could not be found." The GitHub build is now unsandboxed
+  again (as it was through v0.4.10), and the release pipeline is codified in
+  `scripts/build-release-zip.sh` with a guard that refuses sandboxed output.
+- Side benefit: the folder-context feature from v0.4.11/12 no longer needs any
+  grant prompt in this build — double-clicking a file shows its folder
+  immediately, for any readable folder.
+
 ## v0.4.12 — 2026-06-10
 
 **Fixed: folder context now works for folders AIMR couldn't already read.**

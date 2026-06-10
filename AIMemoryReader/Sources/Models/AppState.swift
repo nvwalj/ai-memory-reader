@@ -315,6 +315,10 @@ final class AppState {
     /// file only), the single-file view stays as-is.
     private var directoryContextTask: Task<Void, Never>?
 
+    /// Folders the user declined to grant when offered the directory-context
+    /// prompt. Device-local (like the bookmarks themselves), so plain defaults.
+    private static let declinedFolderGrantsKey = "directoryContextDeclinedPaths_v1"
+
     private func loadDirectoryContext(around url: URL) {
         let parent = url.deletingLastPathComponent()
         let strict = !showAllJsonFiles
@@ -325,10 +329,37 @@ final class AppState {
             try? await Task.sleep(for: .milliseconds(100))
             guard let self, !Task.isCancelled else { return }
             // Bail if the user has moved on (switched source, opened a folder…).
-            guard self.isSingleFileMode, self.selectedFile?.url == url else { return }
-            // The readability probe guards the sandboxed case: a double-click
-            // grants access to the file only, not its folder.
-            guard Self.canReadDirectory(parent) else { return }
+            guard self.isSingleFileMode,
+                  self.selectedFile?.url.standardizedFileURL.path == url.standardizedFileURL.path else { return }
+
+            // A sandboxed double-click grants access to the file only, not its
+            // folder. When the folder isn't readable, ask once per folder —
+            // that's the whole feature for files outside the granted roots.
+            if !Self.canReadDirectory(parent) {
+                #if os(macOS)
+                guard BookmarkStore.isSandboxed else { return }
+                let parentPath = parent.path(percentEncoded: false)
+                var declined = UserDefaults.standard.stringArray(forKey: Self.declinedFolderGrantsKey) ?? []
+                guard !declined.contains(parentPath) else { return }
+                let granted = BookmarkStore.shared.requestAccess(
+                    prompt: "Show Folder",
+                    message: "Grant access to “\(parent.lastPathComponent)” so the sidebar can show the files next to the one you opened. Pick a parent folder to cover more notes at once — AIMR only reads files locally.",
+                    startAt: parent
+                )
+                if granted == nil {
+                    declined.append(parentPath)
+                    UserDefaults.standard.set(declined, forKey: Self.declinedFolderGrantsKey)
+                    return
+                }
+                // The user may have granted an unrelated folder; re-probe and
+                // re-check that they haven't moved on while the panel was up.
+                guard Self.canReadDirectory(parent),
+                      self.isSingleFileMode,
+                      self.selectedFile?.url.standardizedFileURL.path == url.standardizedFileURL.path else { return }
+                #else
+                return
+                #endif
+            }
             let tree = FileTreeBuilder.buildTree(at: parent, strictFiltering: strict)
 
             tree.isExpanded = true

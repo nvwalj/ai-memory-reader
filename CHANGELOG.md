@@ -3,6 +3,19 @@
 All notable changes to AI Memory Reader. Full release notes and downloads:
 https://github.com/nvwalj/ai-memory-reader/releases
 
+## v0.4.12 — 2026-06-10
+
+**Fixed: folder context now works for folders AIMR couldn't already read.**
+
+- v0.4.11's "double-click opens the folder too" silently did nothing when the
+  file's folder wasn't covered by an existing access grant (sandbox rules —
+  most personal notes folders). Now AIMR asks once, with the folder
+  pre-selected: grant it and the sidebar fills in; pick a parent folder to
+  cover more notes at once. Decline and it won't ask again for that folder.
+- Grants persist (security-scoped bookmarks), so it's one click per folder,
+  ever. Also hardened the opened-file match against path normalization
+  differences.
+
 ## v0.4.11 — 2026-06-10
 
 **Double-clicking a file now also opens its folder.**

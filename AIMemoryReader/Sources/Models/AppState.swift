@@ -280,6 +280,7 @@ final class AppState {
 
     /// Open a single file directly without loading directory tree
     func openSingleFile(_ url: URL) {
+        directoryContextTask?.cancel()
         selectedSourceID = "local"
         isSingleFileMode = true
         searchQuery = ""
@@ -302,9 +303,58 @@ final class AppState {
 
         // Watch the single file's parent for changes
         startWatching(url.deletingLastPathComponent())
+
+        loadDirectoryContext(around: url)
+    }
+
+    /// After a direct file open, load the file's surrounding directory into the
+    /// sidebar so siblings are browsable without a trip back to Finder. Runs
+    /// off the main actor so the double-click fast path stays instant; when the
+    /// tree is ready, leaving single-file mode makes the sidebar appear. If the
+    /// parent isn't readable (a sandboxed double-click grants access to the
+    /// file only), the single-file view stays as-is.
+    private var directoryContextTask: Task<Void, Never>?
+
+    private func loadDirectoryContext(around url: URL) {
+        let parent = url.deletingLastPathComponent()
+        let strict = !showAllJsonFiles
+        directoryContextTask = Task { [weak self] in
+            // Let the just-opened file paint first. FileNode isn't Sendable, so
+            // the build runs on the main actor — like every other tree build in
+            // this app (selectSource, drops, FSEvents reconcile).
+            try? await Task.sleep(for: .milliseconds(100))
+            guard let self, !Task.isCancelled else { return }
+            // Bail if the user has moved on (switched source, opened a folder…).
+            guard self.isSingleFileMode, self.selectedFile?.url == url else { return }
+            // The readability probe guards the sandboxed case: a double-click
+            // grants access to the file only, not its folder.
+            guard Self.canReadDirectory(parent) else { return }
+            let tree = FileTreeBuilder.buildTree(at: parent, strictFiltering: strict)
+
+            tree.isExpanded = true
+            // The strict filter only keeps known memory files — the opened file
+            // itself may not qualify. Keep it visible regardless.
+            if self.findNode(url: url, in: tree) == nil {
+                tree.children = (tree.children ?? []) + [FileNode(url: url, isDirectory: false)]
+            }
+            self.rootURL = parent
+            self.rootNode = tree
+            self.selectedFile = self.findNode(url: url, in: tree)
+            self.isSingleFileMode = false
+        }
+    }
+
+    /// A directory counts as readable only if we can actually enumerate it —
+    /// `isReadableFile` alone can pass while a sandbox denies the listing.
+    nonisolated private static func canReadDirectory(_ url: URL) -> Bool {
+        var isDir: ObjCBool = false
+        let path = url.path(percentEncoded: false)
+        guard FileManager.default.fileExists(atPath: path, isDirectory: &isDir), isDir.boolValue else { return false }
+        return (try? FileManager.default.contentsOfDirectory(atPath: path)) != nil
     }
 
     func loadDirectory(_ url: URL) {
+        directoryContextTask?.cancel()
         rootURL = url
         rootNode = FileTreeBuilder.buildTree(at: url, strictFiltering: !showAllJsonFiles)
         rootNode?.isExpanded = true

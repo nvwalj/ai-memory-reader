@@ -41,6 +41,7 @@ AI Memory Reader is free and open source. Three ways to support development:
 - **Strict memory-file filter** — Tree shows only known AI memory/config files by default (markdown, JSONL session logs, known config filenames). Hides noise like `package.json`, `tsconfig.json`. Flip View → "Show All JSON/JSONL Files" to see everything.
 - **Today Panel** — Highlights today's memory file for quick access
 - **File Tree Navigation** — Browse markdown files with an expandable sidebar
+- **Folder Context on File Open** — Double-clicking a file opens it instantly, then the sidebar loads its folder with the file selected, so sibling files are one click away
 - **Table of Contents** — Right sidebar TOC with click-to-jump navigation
 - **Dark & Light Themes** — Follows system appearance
 - **File Watching** — Auto-refreshes when files change on disk

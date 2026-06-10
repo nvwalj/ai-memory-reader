@@ -3,6 +3,23 @@
 All notable changes to AI Memory Reader. Full release notes and downloads:
 https://github.com/nvwalj/ai-memory-reader/releases
 
+## v0.4.11 — 2026-06-10
+
+**Double-clicking a file now also opens its folder.**
+
+- Opening a file directly (Finder double-click, drag-drop, `aimr open`, URL
+  scheme) used to show the lone file with the sidebar hidden. Now the file
+  still opens instantly, and the sidebar then slides in with the file's parent
+  directory loaded and the file selected — siblings (other memory files,
+  configs, transcripts) are one click away, matching how multi-file drops
+  already behave.
+- The directory tree is built off the main thread, so the double-click fast
+  path stays as fast as v0.4.9 made it. If the folder isn't readable (App
+  Store build double-clicks grant access to the file only), the single-file
+  view stays exactly as before.
+- Files that don't look like memory files stay visible in the tree when opened
+  directly, instead of being filtered out from their own folder view.
+
 ## v0.4.10 — 2026-06-03
 
 **Fixed sidebar selection flicker / ghost highlight boxes.**

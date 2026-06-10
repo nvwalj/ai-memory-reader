@@ -427,7 +427,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.4.10;
+				MARKETING_VERSION = 0.4.11;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.aitools.ai-memory-reader";
 				PRODUCT_NAME = "AI Memory Reader";
 				SDKROOT = macosx;
@@ -451,7 +451,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.4.10;
+				MARKETING_VERSION = 0.4.11;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.aitools.ai-memory-reader-ios";
 				PRODUCT_NAME = "AI Memory Reader";
 				SDKROOT = iphoneos;
@@ -596,7 +596,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.4.10;
+				MARKETING_VERSION = 0.4.11;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.aitools.ai-memory-reader-ios";
 				PRODUCT_NAME = "AI Memory Reader";
 				SDKROOT = iphoneos;
@@ -621,7 +621,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.4.10;
+				MARKETING_VERSION = 0.4.11;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.aitools.ai-memory-reader";
 				PRODUCT_NAME = "AI Memory Reader";
 				SDKROOT = macosx;

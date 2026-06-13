@@ -89,14 +89,7 @@ Also supports opening any local folder or individual `.md` / `.json` file. Claud
 
 1. Download the latest **[`AIMemoryReader-vX.Y.Z-universal.zip`](https://github.com/nvwalj/ai-memory-reader/releases/latest)** from the releases page — universal binary (Apple Silicon + Intel).
 2. Unzip and drag `AI Memory Reader.app` into `/Applications`.
-3. **First launch:** macOS will say *"unidentified developer"* because the binary is ad-hoc signed (not yet notarized). Two ways to bypass:
-   - **GUI:** right-click the app in Finder → **Open** → click **Open** in the dialog. Once approved, double-click works forever.
-   - **Terminal one-liner:**
-     ```bash
-     xattr -dr com.apple.quarantine "/Applications/AI Memory Reader.app"
-     ```
-
-> A notarized build will ship once a Developer ID is set up.
+3. Double-click to open. The app is signed with an Apple Developer ID and **notarized by Apple**, so it launches with no security warning.
 
 ### Option 2 — Build from source
 

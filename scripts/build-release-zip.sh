@@ -24,8 +24,33 @@ if codesign -d --entitlements - "$APP" 2>/dev/null | grep -q app-sandbox; then
   exit 1
 fi
 
+# --- Sign with Developer ID Application + hardened runtime (required to notarize) ---
+# Override the identity for forks via AIMR_SIGN_ID.
+SIGN_ID="${AIMR_SIGN_ID:-Developer ID Application: Kollo Inc. (LFUDWMQGY3)}"
+echo "Signing with: $SIGN_ID"
+codesign --force --deep --options runtime --timestamp --sign "$SIGN_ID" "$APP"
+codesign --verify --strict --verbose=2 "$APP"
+
 mkdir -p build/release
-( cd "$(dirname "$APP")" && ditto -c -k --sequesterRsrc --keepParent "AI Memory Reader.app" \
-    "$OLDPWD/build/release/AIMemoryReader-v${VERSION}-universal.zip" )
-cp "build/release/AIMemoryReader-v${VERSION}-universal.zip" build/release/AIMemoryReader.zip
-echo "Built build/release/AIMemoryReader-v${VERSION}-universal.zip (+ AIMemoryReader.zip alias)"
+ZIP="build/release/AIMemoryReader-v${VERSION}-universal.zip"
+( cd "$(dirname "$APP")" && ditto -c -k --sequesterRsrc --keepParent "AI Memory Reader.app" "$OLDPWD/$ZIP" )
+
+# --- Notarize + staple (enabled when credentials are set; else the zip is signed-only) ---
+# Option A: xcrun notarytool store-credentials <name> ...  then  export AIMR_NOTARY_PROFILE=<name>
+# Option B: export AIMR_NOTARY_KEY=/path/AuthKey_XXXX.p8  AIMR_NOTARY_KEY_ID=XXXX  AIMR_NOTARY_ISSUER=<uuid>
+if [ -n "${AIMR_NOTARY_PROFILE:-}" ]; then
+  echo "Notarizing via keychain profile: $AIMR_NOTARY_PROFILE"
+  xcrun notarytool submit "$ZIP" --keychain-profile "$AIMR_NOTARY_PROFILE" --wait
+  xcrun stapler staple "$APP"
+  ( cd "$(dirname "$APP")" && ditto -c -k --sequesterRsrc --keepParent "AI Memory Reader.app" "$OLDPWD/$ZIP" )
+elif [ -n "${AIMR_NOTARY_KEY:-}" ]; then
+  echo "Notarizing via API key: $AIMR_NOTARY_KEY_ID"
+  xcrun notarytool submit "$ZIP" --key "$AIMR_NOTARY_KEY" --key-id "$AIMR_NOTARY_KEY_ID" --issuer "$AIMR_NOTARY_ISSUER" --wait
+  xcrun stapler staple "$APP"
+  ( cd "$(dirname "$APP")" && ditto -c -k --sequesterRsrc --keepParent "AI Memory Reader.app" "$OLDPWD/$ZIP" )
+else
+  echo "⚠ No notary credentials (AIMR_NOTARY_PROFILE or AIMR_NOTARY_KEY*) — zip is SIGNED but NOT notarized."
+fi
+
+cp "$ZIP" build/release/AIMemoryReader.zip
+echo "Built $ZIP (+ AIMemoryReader.zip alias)"

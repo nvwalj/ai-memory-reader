@@ -73,6 +73,11 @@ struct MarkdownEditorView: NSViewRepresentable {
     func updateNSView(_ scrollView: NSScrollView, context: Context) {
         guard let textView = scrollView.documentView as? HighlightingTextView else { return }
 
+        // Never mutate the text view while an IME composition is in flight:
+        // replacing .string mid-composition wipes the marked text (stray newline
+        // on the next Return) and corrupts the undo stack. Resync after commit.
+        if textView.hasMarkedText() { return }
+
         // Only update if text actually changed from outside
         if textView.string != text {
             let selectedRanges = textView.selectedRanges
@@ -121,6 +126,16 @@ struct MarkdownEditorView: NSViewRepresentable {
 
         func textDidChange(_ notification: Notification) {
             guard !isUpdating, let textView else { return }
+
+            // While an input-method composition is active (Chinese / Japanese /
+            // Korean IME "marked text"), do NOT push the binding or re-apply
+            // highlighting. Mutating textStorage mid-composition cancels the IME
+            // session — which makes Return insert a stray newline instead of
+            // confirming the candidate, and desyncs the text view's undo stack.
+            // We reformat once the composition commits: textDidChange fires again
+            // then, with no marked text.
+            if textView.hasMarkedText() { return }
+
             isUpdating = true
             parent.text = textView.string
             parent.onTextChange?(textView.string)
@@ -135,7 +150,10 @@ struct MarkdownEditorView: NSViewRepresentable {
         }
 
         func applyHighlighting() {
-            guard let textView, let textStorage = textView.textStorage else { return }
+            // Never reformat during an active IME composition (see textDidChange):
+            // touching textStorage while marked text is present cancels the session.
+            guard let textView, !textView.hasMarkedText(),
+                  let textStorage = textView.textStorage else { return }
             let text = textView.string
             let fullRange = NSRange(location: 0, length: (text as NSString).length)
 

@@ -86,14 +86,7 @@ AI Memory Reader 是免费开源软件。三种支持方式：
 
 1. 从 [releases 页面](https://github.com/nvwalj/ai-memory-reader/releases/latest)下载最新的 **`AIMemoryReader-vX.Y.Z-universal.zip`** — 通用二进制，Apple Silicon 和 Intel Mac 都能跑。
 2. 解压后把 `AI Memory Reader.app` 拖到 `/Applications`。
-3. **首次启动：** macOS 会提示"未识别的开发者"（应用是 ad-hoc 签名，尚未公证）。两种绕过方式：
-   - **图形界面：** Finder 里右键 app → **打开** → 弹窗里再点 **打开**。一次通过后双击就能用了。
-   - **终端一条命令：**
-     ```bash
-     xattr -dr com.apple.quarantine "/Applications/AI Memory Reader.app"
-     ```
-
-> 公证后的版本会在配 Developer ID 之后推出。
+3. 双击打开即可。应用已用 Apple Developer ID 签名并经 **Apple 公证**，启动不会有任何安全警告。
 
 ### 方案 2 — 从源码构建
 

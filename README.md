@@ -42,6 +42,7 @@ AI Memory Reader is free and open source. Three ways to support development:
 - **Today Panel** — Highlights today's memory file for quick access
 - **File Tree Navigation** — Browse markdown files with an expandable sidebar
 - **Folder Context on File Open** — Double-clicking a file opens it instantly, then the sidebar loads its folder with the file selected, so sibling files are one click away (asks once per folder if access is needed)
+- **Recent Files & Folders** — The sidebar's Recent list remembers the files *and* folders you've opened — by double-click, drag, the Open dialog, or the `aimemoryreader://` URL scheme — most-recent first. Click any entry to jump right back in: files reopen on their own, folders reload the tree. Keeps the last 10 and syncs across your devices via iCloud.
 - **Table of Contents** — Right sidebar TOC with click-to-jump navigation
 - **Dark & Light Themes** — Follows system appearance
 - **File Watching** — Auto-refreshes when files change on disk

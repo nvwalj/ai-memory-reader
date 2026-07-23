@@ -12,7 +12,9 @@ final class SettingsStore: @unchecked Sendable {
 
     // MARK: - Keys
     private enum Key {
-        static let recentFolders = "recentFolders"
+        // Recently opened files AND folders. The key string stays the legacy
+        // "recentFolders" so existing recents (incl. iCloud copies) carry over.
+        static let recentItems = "recentFolders"
         static let customAISourcePaths = "customAISourcePaths"
         static let lastSelectedSourceID = "lastSelectedSourceID"
         static let lastLocalFolderPath = "lastLocalFolderPath"
@@ -38,9 +40,10 @@ final class SettingsStore: @unchecked Sendable {
 
     // MARK: - Public API
 
-    var recentFolders: [String] {
-        get { stringArray(forKey: Key.recentFolders) ?? [] }
-        set { set(newValue, forKey: Key.recentFolders) }
+    /// Recently opened files and folders, most-recent first. Persisted + iCloud-synced.
+    var recentItems: [String] {
+        get { stringArray(forKey: Key.recentItems) ?? [] }
+        set { set(newValue, forKey: Key.recentItems) }
     }
 
     var customAISourcePaths: [String] {
@@ -141,7 +144,7 @@ final class SettingsStore: @unchecked Sendable {
         guard !local.bool(forKey: migrationKey) else { return }
 
         let keysToMigrate = [
-            Key.recentFolders,
+            Key.recentItems,
             Key.customAISourcePaths,
             Key.lastSelectedSourceID,
             Key.lastLocalFolderPath,

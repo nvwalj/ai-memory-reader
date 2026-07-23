@@ -3,6 +3,38 @@
 All notable changes to AI Memory Reader. Full release notes and downloads:
 https://github.com/nvwalj/ai-memory-reader/releases
 
+## v0.5.2 — 2026-07-23
+
+**Opened files and folders now appear in the sidebar's Recent list.**
+
+- The Recent list used to track only folders opened through the Open dialog.
+  Now every file you open — double-clicking in Finder, dragging it in, the Open
+  dialog, or an `aimemoryreader://` link — and every folder you open lands there
+  too, most-recent first. Click any entry to reopen it: files reopen in
+  single-file view, folders reload the tree.
+- The list keeps the last 10 items and de-duplicates, so revisiting something
+  just moves it back to the top. Existing recents (including iCloud-synced
+  copies) carry over untouched.
+
+## v0.5.1 — 2026-06-21
+
+**Fixed Chinese / IME input inserting stray line breaks.**
+
+- Typing with a Chinese / Japanese / Korean input method no longer inserts a
+  random newline when you press Return to confirm a candidate. Re-applying
+  syntax highlighting mid-composition was cancelling the active IME session; the
+  editor now leaves text untouched while a composition is in flight and
+  reformats once it commits.
+- Undo (Ctrl+Z) works correctly again after IME typing.
+
+## v0.5.0 — 2026-06-13
+
+**Signed with an Apple Developer ID and notarized by Apple.**
+
+- Download, unzip, double-click — no more "unidentified developer" / "cannot
+  verify" warning, and no need for the right-click-Open or `xattr` workaround
+  earlier builds required. Universal binary (Apple Silicon + Intel), macOS 13+.
+
 ## v0.4.13 — 2026-06-10
 
 **Fixed "Check for Updates" failing with a hostname error.**

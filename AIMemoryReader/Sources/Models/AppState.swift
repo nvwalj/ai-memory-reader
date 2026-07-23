@@ -76,11 +76,12 @@ final class AppState {
     /// Controls the Suggested Rules sheet visibility.
     var showSuggestedRulesSheet: Bool = false
 
-    // MARK: - Recent Folders
+    // MARK: - Recent Items
 
-    var recentFolders: [String] {
-        get { SettingsStore.shared.recentFolders }
-        set { SettingsStore.shared.recentFolders = newValue }
+    /// Recently opened files and folders (most-recent first), shown in the sidebar "Recent" list.
+    var recentItems: [String] {
+        get { SettingsStore.shared.recentItems }
+        set { SettingsStore.shared.recentItems = newValue }
     }
 
     // MARK: - URL Scheme handling
@@ -267,7 +268,7 @@ final class AppState {
                 selectedSourceID = "local"
                 isSingleFileMode = false
                 SettingsStore.shared.lastLocalFolderPath = url.path(percentEncoded: false)
-                addRecentFolder(url.path(percentEncoded: false))
+                addRecentItem(url)
                 loadDirectory(url)
                 startWatching(url)
             } else {
@@ -281,6 +282,7 @@ final class AppState {
     /// Open a single file directly without loading directory tree
     func openSingleFile(_ url: URL) {
         directoryContextTask?.cancel()
+        addRecentItem(url)
         selectedSourceID = "local"
         isSingleFileMode = true
         searchQuery = ""
@@ -543,22 +545,30 @@ final class AppState {
     }
     #endif
 
-    // MARK: - Recent Folders
+    // MARK: - Recent Items
 
-    func removeRecentFolder(_ path: String) {
-        var folders = recentFolders
-        folders.removeAll { $0 == path }
-        recentFolders = folders
+    /// Max entries kept in the sidebar "Recent" list (files and folders combined).
+    private static let recentItemsLimit = 10
+
+    func removeRecentItem(_ path: String) {
+        var items = recentItems
+        items.removeAll { $0 == path }
+        recentItems = items
     }
 
-    private func addRecentFolder(_ path: String) {
-        var folders = recentFolders
-        folders.removeAll { $0 == path }
-        folders.insert(path, at: 0)
-        if folders.count > 5 {
-            folders = Array(folders.prefix(5))
+    /// Record a just-opened file or folder at the top of the recent list (most-recent
+    /// first, de-duplicated). Covers every open path — Finder double-click, drag-drop,
+    /// the Open dialog, and the URL scheme all funnel through here or `openSingleFile`.
+    func addRecentItem(_ url: URL) {
+        let path = url.path(percentEncoded: false)
+        guard !path.isEmpty else { return }
+        var items = recentItems
+        items.removeAll { $0 == path }
+        items.insert(path, at: 0)
+        if items.count > Self.recentItemsLimit {
+            items = Array(items.prefix(Self.recentItemsLimit))
         }
-        recentFolders = folders
+        recentItems = items
     }
 
     // MARK: - Today File

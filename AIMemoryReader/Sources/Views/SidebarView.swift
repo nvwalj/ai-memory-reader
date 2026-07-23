@@ -151,9 +151,9 @@ struct SidebarView: View {
                 appState.openFolder()
             }
 
-            // Recent Folders
-            if !appState.recentFolders.isEmpty {
-                recentFoldersSection
+            // Recently opened files & folders
+            if !appState.recentItems.isEmpty {
+                recentItemsSection
             }
 
             if appState.availableSources.isEmpty {
@@ -194,7 +194,7 @@ struct SidebarView: View {
         .padding(.bottom, 8)
     }
 
-    private var recentFoldersSection: some View {
+    private var recentItemsSection: some View {
         VStack(alignment: .leading, spacing: 2) {
             Text("Recent")
                 .font(.caption)
@@ -202,10 +202,11 @@ struct SidebarView: View {
                 .padding(.horizontal, 16)
                 .padding(.top, 6)
 
-            ForEach(appState.recentFolders, id: \.self) { path in
+            ForEach(appState.recentItems, id: \.self) { path in
                 let url = URL(fileURLWithPath: path)
+                let isDir = Self.isDirectory(path)
                 HStack(spacing: 6) {
-                    Image(systemName: "clock")
+                    Image(systemName: isDir ? "folder" : "doc.text")
                         .font(.system(size: 11))
                         .foregroundColor(.secondary.opacity(0.6))
                         .frame(width: 18)
@@ -219,20 +220,31 @@ struct SidebarView: View {
                 .padding(.horizontal, 16)
                 .padding(.vertical, 3)
                 .contentShape(Rectangle())
+                .help(path)
                 .onTapGesture {
-                    appState.selectedSourceID = "local"
-                    UserDefaults.standard.set(path, forKey: "lastLocalFolderPath")
-                    appState.loadDirectory(url)
+                    if isDir {
+                        appState.selectedSourceID = "local"
+                        UserDefaults.standard.set(path, forKey: "lastLocalFolderPath")
+                        appState.loadDirectory(url)
+                    } else {
+                        appState.openSingleFile(url)
+                    }
                 }
                 .contextMenu {
                     Button(role: .destructive) {
-                        appState.removeRecentFolder(path)
+                        appState.removeRecentItem(path)
                     } label: {
                         Label("Remove from Recent", systemImage: "trash")
                     }
                 }
             }
         }
+    }
+
+    /// Whether a stored recent path currently points at a directory (vs a file).
+    private static func isDirectory(_ path: String) -> Bool {
+        var isDir: ObjCBool = false
+        return FileManager.default.fileExists(atPath: path, isDirectory: &isDir) && isDir.boolValue
     }
 
     private var searchBar: some View {

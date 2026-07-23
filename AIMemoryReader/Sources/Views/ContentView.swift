@@ -88,6 +88,7 @@ struct MacContentView: View {
             // Single folder dropped — load as directory
             appState.selectedSourceID = "local"
             appState.isSingleFileMode = false
+            appState.addRecentItem(first)
             appState.loadDirectory(first)
             return
         }

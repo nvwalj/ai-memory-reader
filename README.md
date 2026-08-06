@@ -41,7 +41,7 @@ AI Memory Reader is free and open source. Three ways to support development:
 - **Strict memory-file filter** — Tree shows only known AI memory/config files by default (markdown, JSONL session logs, known config filenames). Hides noise like `package.json`, `tsconfig.json`. Flip View → "Show All JSON/JSONL Files" to see everything.
 - **Today Panel** — Highlights today's memory file for quick access
 - **File Tree Navigation** — Browse markdown files with an expandable sidebar
-- **Folder Context on File Open** — Double-clicking a file opens it instantly, then the sidebar loads its folder with the file selected, so sibling files are one click away (asks once per folder if access is needed)
+- **Folder Context on File Open** — Double-clicking a file opens it instantly, then the sidebar loads its folder with the file selected, so sibling files are one click away (asks once per folder if access is needed). The folder scan runs in the background and is cancelled if you navigate away, so opening a file inside a huge directory keeps the app responsive instead of freezing it
 - **Recent Files & Folders** — The sidebar's Recent list remembers the files *and* folders you've opened — by double-click, drag, the Open dialog, or the `aimemoryreader://` URL scheme — most-recent first. Click any entry to jump right back in: files reopen on their own, folders reload the tree. Keeps the last 10 and syncs across your devices via iCloud.
 - **Table of Contents** — Right sidebar TOC with click-to-jump navigation
 - **Dark & Light Themes** — Follows system appearance

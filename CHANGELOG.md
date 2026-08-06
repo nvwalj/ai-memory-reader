@@ -3,6 +3,30 @@
 All notable changes to AI Memory Reader. Full release notes and downloads:
 https://github.com/nvwalj/ai-memory-reader/releases
 
+## v0.5.3 — 2026-08-06
+
+**Fixed the app freezing when you open a file inside a large folder.**
+
+- Opening a file in a folder with many subdirectories — a project root, a
+  Downloads folder, anything near `node_modules` — froze the window while AIMR
+  walked the directory to fill the sidebar. The walk ran on the main thread, so
+  the freeze lasted as long as the scan: on a 200,000-entry folder, about
+  **2.6–3.5 seconds** of an unresponsive app. The directory scan now runs off
+  the main thread and the UI keeps working throughout; the main thread's share
+  of the same scan dropped to **2–3 milliseconds**.
+- The same path was used by every tree load, so this also fixes the stall when
+  opening a large folder with ⌘O, when toggling "Show All JSON/JSONL Files",
+  and — the one most people felt without naming it — on **every filesystem
+  change** in a busy source like `~/.claude/projects`, where an agent writing
+  session logs triggered a rebuild after each burst of writes.
+- Scans are now cancelled when you navigate away, so switching folders no
+  longer waits for the previous scan to finish.
+- The sidebar shows "Scanning folder…" while a scan is in flight, instead of
+  the "No folder opened" empty state, which read as a failure.
+- Also fixed a hot-path inefficiency in the same code: whether an entry is a
+  directory was being looked up inside the sort comparator, i.e. O(n log n)
+  times per directory instead of once per entry.
+
 ## v0.5.2 — 2026-07-23
 
 **Opened files and folders now appear in the sidebar's Recent list.**

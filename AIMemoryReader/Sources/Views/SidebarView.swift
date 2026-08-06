@@ -48,6 +48,8 @@ struct SidebarView: View {
                 }
                 .listStyle(.sidebar)
                 .scrollContentBackground(palette.isEyeCare ? .hidden : .automatic)
+            } else if appState.isLoadingTree {
+                scanningState
             } else {
                 emptyState
             }
@@ -319,6 +321,22 @@ struct SidebarView: View {
                 .listStyle(.sidebar)
             }
         }
+    }
+
+    /// Shown while a directory is being walked off the main actor. Without it a
+    /// large folder would show "No folder opened" until the scan finished,
+    /// which reads as a failure rather than as progress.
+    private var scanningState: some View {
+        VStack(spacing: 12) {
+            Spacer()
+            ProgressView()
+                .controlSize(.small)
+            Text("Scanning folder…")
+                .font(.callout)
+                .foregroundColor(.secondary)
+            Spacer()
+        }
+        .frame(maxWidth: .infinity)
     }
 
     private var emptyState: some View {

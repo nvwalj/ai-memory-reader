@@ -11,6 +11,15 @@ final class AppState {
     /// When true, a single file was opened directly (not a directory)
     var isSingleFileMode: Bool = false
 
+    /// True while a directory tree is being scanned off the main actor. The
+    /// scan of a large folder can take a moment; the sidebar shows progress
+    /// instead of an empty tree it can't explain.
+    var isLoadingTree: Bool = false
+
+    /// The in-flight tree scan, cancelled whenever a new one starts so we never
+    /// pay for a walk whose result is already stale.
+    private var treeLoadTask: Task<Void, Never>?
+
     var availableSources: [AISource] = []
 
     /// True until the first asynchronous source detection finishes. Used to
@@ -325,9 +334,9 @@ final class AppState {
         let parent = url.deletingLastPathComponent()
         let strict = !showAllJsonFiles
         directoryContextTask = Task { [weak self] in
-            // Let the just-opened file paint first. FileNode isn't Sendable, so
-            // the build runs on the main actor — like every other tree build in
-            // this app (selectSource, drops, FSEvents reconcile).
+            // Let the just-opened file paint first. The walk itself runs off the
+            // main actor (see FileTreeBuilder.scan) — a folder with thousands of
+            // entries used to freeze the window here for as long as the walk took.
             try? await Task.sleep(for: .milliseconds(100))
             guard let self, !Task.isCancelled else { return }
             // Bail if the user has moved on (switched source, opened a folder…).
@@ -362,8 +371,17 @@ final class AppState {
                 return
                 #endif
             }
-            let tree = FileTreeBuilder.buildTree(at: parent, strictFiltering: strict)
+            self.isLoadingTree = true
+            let snapshot = await FileTreeBuilder.scan(at: parent, strictFiltering: strict)
+            self.isLoadingTree = false
 
+            // A big folder can take a while to walk. Re-check that the user is
+            // still looking at this file before replacing what's on screen.
+            guard let snapshot, !Task.isCancelled,
+                  self.isSingleFileMode,
+                  self.selectedFile?.url.standardizedFileURL.path == url.standardizedFileURL.path else { return }
+
+            let tree = FileTreeBuilder.materialize(snapshot)
             tree.isExpanded = true
             // The strict filter only keeps known memory files — the opened file
             // itself may not qualify. Keep it visible regardless.
@@ -388,25 +406,51 @@ final class AppState {
 
     func loadDirectory(_ url: URL) {
         directoryContextTask?.cancel()
+        treeLoadTask?.cancel()
         rootURL = url
-        rootNode = FileTreeBuilder.buildTree(at: url, strictFiltering: !showAllJsonFiles)
-        rootNode?.isExpanded = true
+        // Drop the previous directory's tree immediately: showing the old
+        // folder's files under the new folder's name is worse than showing
+        // the loading state for a moment.
+        rootNode = nil
         selectedFile = nil
         todayFileNode = nil
+
+        let strict = !showAllJsonFiles
+        isLoadingTree = true
+        treeLoadTask = Task { [weak self] in
+            let snapshot = await FileTreeBuilder.scan(at: url, strictFiltering: strict)
+            guard let self else { return }
+            self.isLoadingTree = false
+            // Bail if this load was superseded while the walk ran.
+            guard let snapshot, !Task.isCancelled, self.rootURL == url else { return }
+            let tree = FileTreeBuilder.materialize(snapshot)
+            tree.isExpanded = true
+            self.rootNode = tree
+        }
     }
 
     /// Rebuild the current tree using the current filter mode. Preserves
     /// expanded directories and the selected file when possible.
     func rebuildCurrentTree() {
         guard let rootURL else { return }
-        let fresh = FileTreeBuilder.buildTree(at: rootURL, strictFiltering: !showAllJsonFiles)
-        if let existing = rootNode {
-            // In-place reconcile (see handleFileSystemChange) — the show-all toggle
-            // adds/removes many files but keeps expansion and selection stable.
-            FileTreeBuilder.merge(into: existing, from: fresh)
-        } else {
-            rootNode = fresh
-            rootNode?.isExpanded = true
+        treeLoadTask?.cancel()
+
+        let strict = !showAllJsonFiles
+        isLoadingTree = true
+        treeLoadTask = Task { [weak self] in
+            let snapshot = await FileTreeBuilder.scan(at: rootURL, strictFiltering: strict)
+            guard let self else { return }
+            self.isLoadingTree = false
+            guard let snapshot, !Task.isCancelled, self.rootURL == rootURL else { return }
+            let fresh = FileTreeBuilder.materialize(snapshot)
+            if let existing = self.rootNode {
+                // In-place reconcile (see handleFileSystemChange) — the show-all toggle
+                // adds/removes many files but keeps expansion and selection stable.
+                FileTreeBuilder.merge(into: existing, from: fresh)
+            } else {
+                fresh.isExpanded = true
+                self.rootNode = fresh
+            }
         }
     }
 
@@ -526,22 +570,33 @@ final class AppState {
     private func handleFileSystemChange() {
         guard let rootURL else { return }
 
-        let fresh = FileTreeBuilder.buildTree(at: rootURL, strictFiltering: !showAllJsonFiles)
-        if let existing = rootNode {
-            // Reconcile in place: reuse existing FileNode objects where paths match,
-            // so the sidebar List — and its selection, expansion, and scroll — is
-            // never torn down on a filesystem event. Only genuine adds/removes mutate
-            // the tree. (Previously this replaced rootNode wholesale and the List was
-            // force-recreated via `.id(fileChangeToken)`, which caused selection
-            // flicker and ghost highlights on busy sources like ~/.claude.)
-            FileTreeBuilder.merge(into: existing, from: fresh)
-        } else {
-            rootNode = fresh
-            rootNode?.isExpanded = true
-        }
-
-        // Tell the detail view to reload the open file's content from disk.
+        // Tell the detail view to reload the open file's content from disk. This
+        // is the cheap half and shouldn't wait on the directory walk.
         fileChangeToken += 1
+
+        // Re-walk off the main actor. On a busy source like ~/.claude/projects
+        // this fires every time an agent appends to a session log, so doing it
+        // on the main thread meant a stall per burst of writes. No loading
+        // state here on purpose — the tree on screen stays valid meanwhile.
+        treeLoadTask?.cancel()
+        let strict = !showAllJsonFiles
+        treeLoadTask = Task { [weak self] in
+            let snapshot = await FileTreeBuilder.scan(at: rootURL, strictFiltering: strict)
+            guard let self, let snapshot, !Task.isCancelled, self.rootURL == rootURL else { return }
+            let fresh = FileTreeBuilder.materialize(snapshot)
+            if let existing = self.rootNode {
+                // Reconcile in place: reuse existing FileNode objects where paths match,
+                // so the sidebar List — and its selection, expansion, and scroll — is
+                // never torn down on a filesystem event. Only genuine adds/removes mutate
+                // the tree. (Previously this replaced rootNode wholesale and the List was
+                // force-recreated via `.id(fileChangeToken)`, which caused selection
+                // flicker and ghost highlights on busy sources like ~/.claude.)
+                FileTreeBuilder.merge(into: existing, from: fresh)
+            } else {
+                fresh.isExpanded = true
+                self.rootNode = fresh
+            }
+        }
     }
     #endif
 

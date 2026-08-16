@@ -40,9 +40,17 @@ struct MarkdownDetailView: View {
     @Environment(\.themePalette) private var palette
     let fileNode: FileNode
     let fileChangeToken: Int
+    /// The file exactly as it is on disk. Drives edit mode, saving, and the
+    /// character count — never the rendering.
     @State private var rawContent: String?
+    /// What the renderers see: `rawContent` with `[[wiki links]]` expanded into
+    /// real markdown links. Kept separate so edit mode still shows the source.
+    @State private var displayContent: String = ""
     @State private var editableContent: String = ""
     @State private var loadError: String?
+    /// Transient message shown when a link points at nothing.
+    @State private var linkError: String?
+    @State private var linkErrorTask: Task<Void, Never>?
     @State private var tocEntries: [TOCEntry] = []
     @State private var sections: [MarkdownSection] = []
     @State private var activeEntryID: String?
@@ -103,6 +111,21 @@ struct MarkdownDetailView: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }
+        .overlay(alignment: .bottom) {
+            if let linkError {
+                Text(linkError)
+                    .font(.callout)
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 9)
+                    .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 8))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .strokeBorder(Color.primary.opacity(0.12))
+                    )
+                    .padding(.bottom, 24)
+                    .transition(.opacity)
+            }
+        }
         .task(id: fileNode.id) {
             await loadFile()
         }
@@ -129,6 +152,7 @@ struct MarkdownDetailView: View {
         }
         .onDisappear {
             autoSaveTask?.cancel()
+            linkErrorTask?.cancel()
         }
         .onReceive(NotificationCenter.default.publisher(for: .editorManualSave)) { _ in
             if isEditMode {
@@ -136,20 +160,16 @@ struct MarkdownDetailView: View {
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: .exportPDF)) { _ in
-            if let content = rawContent {
+            if rawContent != nil {
                 let filename = fileNode.url.deletingPathExtension().lastPathComponent
                 let baseURL = fileNode.url.deletingLastPathComponent()
-                PDFExporter.exportToPDF(markdownText: content, defaultFilename: filename, baseURL: baseURL)
+                PDFExporter.exportToPDF(markdownText: displayContent, defaultFilename: filename, baseURL: baseURL)
             }
         }
-        .onChange(of: appState.pendingURLHeading) { _, heading in
-            if let heading, !heading.isEmpty {
-                // Find matching TOC entry and scroll to it
-                if let entry = tocEntries.first(where: { $0.title.localizedCaseInsensitiveContains(heading) }) {
-                    scrollTarget = entry.id
-                }
-                appState.pendingURLHeading = nil
-            }
+        .onChange(of: appState.pendingHeading) { _, _ in
+            // Fires for a jump inside the file already on screen; a jump to a
+            // different file is consumed by `loadFile` once its TOC exists.
+            consumePendingHeading()
         }
     }
 
@@ -278,7 +298,8 @@ struct MarkdownDetailView: View {
                 baseAttributed: rendered.attributed,
                 matchRanges: findMatchRanges,
                 currentIndex: findCurrentIndex,
-                palette: palette
+                palette: palette,
+                onLink: { handleLink($0) }
             )
             .background(palette.isEyeCare
                         ? AnyShapeStyle(palette.background)
@@ -305,8 +326,8 @@ struct MarkdownDetailView: View {
                         }
                     }
                     .padding(.vertical, 16)
-                    .environment(\.openURL, OpenURLAction { url in
-                        return Self.handleLocalLink(url: url, baseURL: fileBaseURL)
+                    .environment(\.openURL, OpenURLAction { (url: URL) -> OpenURLAction.Result in
+                        handleLink(url) ? .handled : .systemAction
                     })
                 }
                 .background(palette.isEyeCare
@@ -332,11 +353,14 @@ struct MarkdownDetailView: View {
             saveIfNeeded()
             rawContent = editableContent
             if fileNode.isJSON {
+                displayContent = editableContent
                 tocEntries = []
                 sections = Self.makeJSONSections(editableContent)
             } else {
-                tocEntries = TOCParser.parse(editableContent)
-                sections = MarkdownSplitter.split(editableContent, entries: tocEntries)
+                let display = WikiLinkRewriter.rewrite(editableContent)
+                displayContent = display
+                tocEntries = TOCParser.parse(display)
+                sections = MarkdownSplitter.split(display, entries: tocEntries)
             }
         } else {
             // Switching from Read → Edit: load content into editor
@@ -421,8 +445,8 @@ struct MarkdownDetailView: View {
     /// Build the `ReadableMarkdownRenderer` output lazily — only when the
     /// find bar opens — and reuse it across keystrokes.
     private func ensureRenderedForFind() {
-        guard let raw = rawContent else { return }
-        renderedForFind = ReadableMarkdownRenderer.render(raw, palette: palette)
+        guard rawContent != nil else { return }
+        renderedForFind = ReadableMarkdownRenderer.render(displayContent, palette: palette)
     }
 
     private func recomputeFindMatches() {
@@ -464,35 +488,65 @@ struct MarkdownDetailView: View {
 
     // MARK: - Link Handling
 
-    /// Handle links: open local file links with default app, web links in browser
-    static func handleLocalLink(url: URL, baseURL: URL) -> OpenURLAction.Result {
-        // Web links — let the system handle them
-        if url.scheme == "http" || url.scheme == "https" || url.scheme == "mailto" {
-            return .systemAction
-        }
+    /// Route a clicked link. Anything that resolves to a file the reader can
+    /// display stays inside the app; the rest goes to the system.
+    /// Returns true when the app handled it and the system should stay out.
+    private func handleLink(_ url: URL) -> Bool {
+        switch LinkResolver.resolve(url, relativeTo: fileBaseURL) {
+        case .web:
+            return false
 
-        // Resolve the local path
-        let resolvedURL: URL
-        if url.scheme == "file" {
-            resolvedURL = url
-        } else {
-            // Relative path or bare path
-            let path = url.absoluteString.removingPercentEncoding ?? url.absoluteString
-            if path.hasPrefix("/") {
-                resolvedURL = URL(fileURLWithPath: path)
+        case .anchor(let fragment):
+            scrollToHeading(fragment)
+
+        case .document(let fileURL, let heading):
+            if fileURL.path(percentEncoded: false) == fileNode.url.path(percentEncoded: false) {
+                // A link back into the file already open — just move.
+                if let heading { scrollToHeading(heading) }
             } else {
-                resolvedURL = baseURL.appendingPathComponent(path)
+                appState.navigate(to: fileURL, heading: heading)
             }
-        }
 
-        // Open with default system app
-        let fileURL = resolvedURL.isFileURL ? resolvedURL : URL(fileURLWithPath: resolvedURL.path)
-        if FileManager.default.fileExists(atPath: fileURL.path(percentEncoded: false)) {
+        case .directory(let directoryURL):
+            appState.openDirectory(directoryURL)
+
+        case .externalFile(let fileURL):
             NSWorkspace.shared.open(fileURL)
-            return .handled
-        }
 
-        return .systemAction
+        case .missing(let text):
+            showLinkError("No file named “\(text)” next to this one.")
+        }
+        return true
+    }
+
+    private func scrollToHeading(_ heading: String) {
+        guard let entry = TOCParser.entry(for: heading, in: tocEntries) else {
+            showLinkError("No heading “\(heading)” in this file.")
+            return
+        }
+        activeEntryID = entry.id
+        scrollTarget = entry.id
+    }
+
+    /// Consume a scroll request queued by `AppState.navigate` — but only the one
+    /// addressed to this file, so the view showing the *previous* document
+    /// doesn't eat a jump meant for the next one.
+    private func consumePendingHeading() {
+        guard let pending = appState.pendingHeading,
+              pending.filePath == fileNode.url.path(percentEncoded: false),
+              rawContent != nil else { return }
+        appState.pendingHeading = nil
+        scrollToHeading(pending.heading)
+    }
+
+    private func showLinkError(_ message: String) {
+        linkErrorTask?.cancel()
+        withAnimation { linkError = message }
+        linkErrorTask = Task { @MainActor in
+            try? await Task.sleep(for: .seconds(3))
+            guard !Task.isCancelled else { return }
+            withAnimation { linkError = nil }
+        }
     }
 
     // MARK: - Load File
@@ -509,17 +563,22 @@ struct MarkdownDetailView: View {
             }
 
             if fileNode.isJSON {
-                let displayText = Self.prettyPrintJSON(text) ?? text
-                rawContent = displayText
-                editableContent = displayText
+                let pretty = Self.prettyPrintJSON(text) ?? text
+                rawContent = pretty
+                displayContent = pretty
+                editableContent = pretty
                 tocEntries = []
-                sections = Self.makeJSONSections(displayText)
+                sections = Self.makeJSONSections(pretty)
             } else {
+                let display = WikiLinkRewriter.rewrite(text)
                 rawContent = text
+                displayContent = display
                 editableContent = text
-                tocEntries = TOCParser.parse(text)
-                sections = MarkdownSplitter.split(text, entries: tocEntries)
+                tocEntries = TOCParser.parse(display)
+                sections = MarkdownSplitter.split(display, entries: tocEntries)
             }
+            // The TOC exists now, so a jump queued for this file can land.
+            consumePendingHeading()
         } catch {
             loadError = error.localizedDescription
         }

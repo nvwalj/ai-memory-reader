@@ -134,6 +134,22 @@ struct AIMemoryReaderApp: App {
             }
 
             CommandGroup(after: .sidebar) {
+                // Links inside a document now navigate in place, so there has
+                // to be a way back out.
+                Button("Back") {
+                    appState.goBack()
+                }
+                .keyboardShortcut("[", modifiers: .command)
+                .disabled(!appState.canGoBack)
+
+                Button("Forward") {
+                    appState.goForward()
+                }
+                .keyboardShortcut("]", modifiers: .command)
+                .disabled(!appState.canGoForward)
+
+                Divider()
+
                 Button("OpenClaw Source") {
                     if let source = appState.availableSources.first(where: { $0.id == "openclaw" }) {
                         appState.selectSource(source)

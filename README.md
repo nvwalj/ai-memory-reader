@@ -44,6 +44,8 @@ AI Memory Reader is free and open source. Three ways to support development:
 - **Folder Context on File Open** — Double-clicking a file opens it instantly, then the sidebar loads its folder with the file selected, so sibling files are one click away (asks once per folder if access is needed). The folder scan runs in the background and is cancelled if you navigate away, so opening a file inside a huge directory keeps the app responsive instead of freezing it
 - **Recent Files & Folders** — The sidebar's Recent list remembers the files *and* folders you've opened — by double-click, drag, the Open dialog, or the `aimemoryreader://` URL scheme — most-recent first. Click any entry to jump right back in: files reopen on their own, folders reload the tree. Keeps the last 10 and syncs across your devices via iCloud.
 - **Table of Contents** — Right sidebar TOC with click-to-jump navigation
+- **Links That Go Somewhere** — Click a link to another local file and it opens in the reader, selected in the sidebar, instead of bouncing you out to whatever app owns `.md`. Relative paths, `../` paths, absolute and `~/` paths all work; `file.md#heading` lands on the heading, `#heading` jumps within the page. **⌘[ / ⌘]** move back and forward through everything you've opened. Links to a folder load it in the sidebar; images, PDFs, and source files still open in their usual app
+- **Wiki Links** — `[[name]]` and `[[target|label]]` are clickable, so Claude's cross-referenced memory files and Obsidian vaults navigate the way they were written. Matching ignores separators and case, so `[[user-profile]]` finds `user_profile.md`. Display-only — edit mode still shows the file's real text
 - **Dark & Light Themes** — Follows system appearance
 - **File Watching** — Auto-refreshes when files change on disk
 - **Full-Text Search** — Search across all files in the current directory
@@ -140,6 +142,8 @@ aimr open ~/.openclaw/workspace/MEMORY.md --heading "About Me"
 | ⌘E | Toggle edit/read mode |
 | ⌘S | Save (in edit mode) |
 | ⌘F | Focus search |
+| ⌘[ | Back — the file you were reading before |
+| ⌘] | Forward |
 | ⌘1 | Switch to the first detected AI source (Claude Code by default) |
 | ⌘2 | Open local files |
 

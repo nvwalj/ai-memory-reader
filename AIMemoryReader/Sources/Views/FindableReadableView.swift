@@ -19,6 +19,9 @@ struct FindableReadableView: NSViewRepresentable {
     /// `matchRanges` is empty.
     let currentIndex: Int
     let palette: ThemePalette
+    /// Called when a link is clicked. Returns true when the app handled it
+    /// itself, which keeps the system out of it.
+    let onLink: (URL) -> Bool
 
     func makeCoordinator() -> Coordinator { Coordinator() }
 
@@ -55,6 +58,8 @@ struct FindableReadableView: NSViewRepresentable {
             .cursor: NSCursor.pointingHand
         ]
 
+        textView.onLink = onLink
+
         scrollView.documentView = textView
         context.coordinator.textView = textView
 
@@ -65,6 +70,7 @@ struct FindableReadableView: NSViewRepresentable {
 
     func updateNSView(_ scrollView: NSScrollView, context: Context) {
         guard let textView = scrollView.documentView as? ReadableTextView else { return }
+        textView.onLink = onLink
         textView.linkTextAttributes = [
             .foregroundColor: NSColor(palette.link),
             .underlineStyle: NSUnderlineStyle.single.rawValue,
@@ -144,10 +150,16 @@ struct FindableReadableView: NSViewRepresentable {
     }
 }
 
-/// NSTextView that forwards link clicks to the system — the parent DetailView
-/// installs a custom action for local file links.
+/// NSTextView that gives the app first refusal on link clicks, so a link to a
+/// neighbouring memory file navigates in place instead of launching whatever
+/// app owns `.md`. Anything the app declines falls through to the system.
 final class ReadableTextView: NSTextView {
-    // Let clicks on links follow the textView's default behavior (opens URL).
-    // Local-file handling is done in a delegate override below.
+    var onLink: ((URL) -> Bool)?
+
+    override func clicked(onLink link: Any, at charIndex: Int) {
+        let url = (link as? URL) ?? (link as? String).flatMap { URL(string: $0) }
+        if let url, onLink?(url) == true { return }
+        super.clicked(onLink: link, at: charIndex)
+    }
 }
 #endif

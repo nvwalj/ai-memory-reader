@@ -319,13 +319,18 @@ struct iOSDetailView: View {
         .task(id: fileNode.id) {
             await loadFile()
         }
-        .onChange(of: appState.pendingURLHeading) { _, heading in
-            if let heading, !heading.isEmpty {
-                if let entry = tocEntries.first(where: { $0.title.localizedCaseInsensitiveContains(heading) }) {
-                    scrollTarget = entry.id
-                }
-                appState.pendingURLHeading = nil
-            }
+        .onChange(of: appState.pendingHeading) { _, _ in
+            consumePendingHeading()
+        }
+    }
+
+    private func consumePendingHeading() {
+        guard let pending = appState.pendingHeading,
+              pending.filePath == fileNode.url.path(percentEncoded: false),
+              rawContent != nil else { return }
+        appState.pendingHeading = nil
+        if let entry = TOCParser.entry(for: pending.heading, in: tocEntries) {
+            scrollTarget = entry.id
         }
     }
 
@@ -344,10 +349,12 @@ struct iOSDetailView: View {
                 tocEntries = []
                 sections = [MarkdownSection(id: "json-content", content: "```json\n\(displayText)\n```")]
             } else {
+                let display = WikiLinkRewriter.rewrite(text)
                 rawContent = text
-                tocEntries = TOCParser.parse(text)
-                sections = MarkdownSplitter.split(text, entries: tocEntries)
+                tocEntries = TOCParser.parse(display)
+                sections = MarkdownSplitter.split(display, entries: tocEntries)
             }
+            consumePendingHeading()
         } catch {
             loadError = error.localizedDescription
         }

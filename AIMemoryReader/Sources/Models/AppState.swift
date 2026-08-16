@@ -5,8 +5,23 @@ import UniformTypeIdentifiers
 @Observable
 final class AppState {
     var rootNode: FileNode?
-    var selectedFile: FileNode?
     var rootURL: URL?
+
+    /// Every path into a file funnels through here — sidebar clicks, search
+    /// hits, and links inside a document — so the back/forward stacks below
+    /// only have to watch this one property.
+    var selectedFile: FileNode? {
+        didSet {
+            guard !isRestoringHistory, oldValue != selectedFile else { return }
+            if let oldValue {
+                backStack.append(oldValue)
+                if backStack.count > Self.historyLimit {
+                    backStack.removeFirst(backStack.count - Self.historyLimit)
+                }
+            }
+            forwardStack.removeAll()
+        }
+    }
 
     /// When true, a single file was opened directly (not a directory)
     var isSingleFileMode: Bool = false
@@ -96,7 +111,95 @@ final class AppState {
     // MARK: - URL Scheme handling
 
     var pendingURLPath: String?
-    var pendingURLHeading: String?
+
+    /// A heading the detail view should scroll to once `filePath` is on screen.
+    /// Carrying the path matters: the jump is requested before the target file
+    /// has parsed its headings, and the view that's still showing the *old*
+    /// file must not swallow the request.
+    struct PendingHeading: Equatable {
+        let filePath: String
+        let heading: String
+    }
+
+    var pendingHeading: PendingHeading?
+
+    // MARK: - Navigation history
+
+    /// Files visited in this window, oldest first. Capped so a long reading
+    /// session doesn't retain every node it ever touched.
+    private static let historyLimit = 100
+    private(set) var backStack: [FileNode] = []
+    private(set) var forwardStack: [FileNode] = []
+    /// Set while `goBack`/`goForward` move the selection, so the `didSet` above
+    /// doesn't record the move as a new destination.
+    private var isRestoringHistory = false
+
+    var canGoBack: Bool { !backStack.isEmpty }
+    var canGoForward: Bool { !forwardStack.isEmpty }
+
+    func goBack() {
+        guard let previous = backStack.popLast() else { return }
+        if let current = selectedFile { forwardStack.append(current) }
+        show(previous)
+    }
+
+    func goForward() {
+        guard let next = forwardStack.popLast() else { return }
+        if let current = selectedFile { backStack.append(current) }
+        show(next)
+    }
+
+    private func show(_ node: FileNode) {
+        // Prefer the live node: a link jump can replace the tree, and the one on
+        // the stack is then a detached object the sidebar wouldn't highlight.
+        let inTree = findNode(path: node.id, in: rootNode)
+        isRestoringHistory = true
+        selectedFile = inTree ?? node
+        isRestoringHistory = false
+        if let inTree { expandPathTo(node: inTree) }
+    }
+
+    private func clearHistory() {
+        backStack.removeAll()
+        forwardStack.removeAll()
+    }
+
+    // MARK: - In-document links
+
+    /// Open a file linked from the document on screen, selecting it in the
+    /// sidebar when the tree already has it. `heading` is the link's `#fragment`.
+    func navigate(to url: URL, heading: String? = nil) {
+        let target = url.standardizedFileURL
+        let path = target.path(percentEncoded: false)
+
+        if let node = findNode(path: path, in: rootNode) {
+            expandPathTo(node: node)
+            selectedFile = node
+            addRecentItem(target)
+        } else {
+            // Outside the loaded tree, or hidden by the strict filter. Open it
+            // the way a double-click would — that also pulls in its folder.
+            openSingleFile(target)
+        }
+
+        if let heading, !heading.isEmpty {
+            pendingHeading = PendingHeading(filePath: path, heading: heading)
+        }
+    }
+
+    /// Load a folder into the sidebar as the current local source. Shared by the
+    /// Open dialog and by links that point at a directory.
+    func openDirectory(_ url: URL) {
+        directoryContextTask?.cancel()
+        selectedSourceID = "local"
+        isSingleFileMode = false
+        searchQuery = ""
+        searchResults = []
+        SettingsStore.shared.lastLocalFolderPath = url.path(percentEncoded: false)
+        addRecentItem(url)
+        loadDirectory(url)
+        startWatching(url)
+    }
 
     init() {
         // NOTE: source detection is deliberately NOT done here. Scanning the
@@ -274,12 +377,7 @@ final class AppState {
 
         if panel.runModal() == .OK, let url = panel.url {
             if url.hasDirectoryPath {
-                selectedSourceID = "local"
-                isSingleFileMode = false
-                SettingsStore.shared.lastLocalFolderPath = url.path(percentEncoded: false)
-                addRecentItem(url)
-                loadDirectory(url)
-                startWatching(url)
+                openDirectory(url)
             } else {
                 // Single file selected - open directly without loading directory tree
                 openSingleFile(url)
@@ -407,6 +505,9 @@ final class AppState {
     func loadDirectory(_ url: URL) {
         directoryContextTask?.cancel()
         treeLoadTask?.cancel()
+        // A different tree means the back stack points at files that are no
+        // longer reachable from the sidebar. Start over.
+        clearHistory()
         rootURL = url
         // Drop the previous directory's tree immediately: showing the old
         // folder's files under the new folder's name is worse than showing
@@ -472,8 +573,11 @@ final class AppState {
 
                 if FileManager.default.fileExists(atPath: fileURL.path) {
                     openSingleFile(fileURL)
-                    if let heading {
-                        pendingURLHeading = heading
+                    if let heading, !heading.isEmpty {
+                        pendingHeading = PendingHeading(
+                            filePath: fileURL.path(percentEncoded: false),
+                            heading: heading
+                        )
                     }
                 }
             }
@@ -646,6 +750,23 @@ final class AppState {
         if let children = node.children {
             for child in children {
                 if let found = findNode(url: url, in: child) {
+                    return found
+                }
+            }
+        }
+        return nil
+    }
+
+    /// Same lookup keyed on the filesystem path. A URL built by appending a
+    /// relative link to a folder is not `==` to the one the tree walk produced
+    /// even when both name the same file; `FileNode.id` is the decoded path, so
+    /// comparing that is what actually matches.
+    func findNode(path: String, in node: FileNode?) -> FileNode? {
+        guard let node else { return nil }
+        if node.id == path { return node }
+        if let children = node.children {
+            for child in children {
+                if let found = findNode(path: path, in: child) {
                     return found
                 }
             }

@@ -3,6 +3,31 @@
 All notable changes to AI Memory Reader. Full release notes and downloads:
 https://github.com/nvwalj/ai-memory-reader/releases
 
+## v0.5.4 — 2026-08-15
+
+**Links between local files now navigate inside the app.**
+
+- Clicking a link to another file — `[User profile](user_profile.md)`,
+  `../CLAUDE.md`, `notes/2026-08-10.md`, an absolute path, a `~/` path — opens
+  it in the reader and selects it in the sidebar. Before, it was handed to the
+  system, which bounced you out to whatever app owns `.md`.
+- `[[wiki links]]` are clickable. Claude's memory files cross-reference each
+  other with `[[name]]`, and Obsidian vaults use the same syntax; CommonMark
+  renders both as dead brackets. `[[target|label]]` works too. The rewrite is
+  display-only — edit mode still shows the file's real text.
+- Wiki links resolve even when the slug doesn't match the filename. Claude
+  writes `[[user-profile]]` for a file stored as `user_profile.md`; separators
+  and case are ignored when matching, and a bare `[[notes]]` finds `notes.md`.
+- `#heading` links jump within the file, and `file.md#heading` jumps to a
+  heading in another file. Anchors are matched the way GitHub slugifies
+  headings, so links written for GitHub land in the right place here.
+- **Back** (⌘[) and **Forward** (⌘]) in the View menu, because links that
+  navigate in place need a way back. Sidebar clicks and search hits share the
+  same history.
+- Links to a folder load it in the sidebar. Links to files the reader can't
+  display — images, PDFs, source files — still go to the system, as before.
+- A link that points at nothing now says so, instead of silently doing nothing.
+
 ## v0.5.3 — 2026-08-06
 
 **Fixed the app freezing when you open a file inside a large folder.**

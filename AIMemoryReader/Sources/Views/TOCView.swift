@@ -35,9 +35,7 @@ enum TOCParser {
 
             if let level, let title, !title.isEmpty {
                 // Generate unique ID based on title
-                let baseID = title.lowercased()
-                    .replacingOccurrences(of: " ", with: "-")
-                    .filter { $0.isLetter || $0.isNumber || $0 == "-" }
+                let baseID = slug(title)
                 let count = counts[baseID, default: 0]
                 counts[baseID] = count + 1
                 let uniqueID = count == 0 ? "toc-\(baseID)" : "toc-\(baseID)-\(count)"
@@ -45,6 +43,26 @@ enum TOCParser {
             }
         }
         return entries
+    }
+
+    /// The anchor form of a heading — lowercase, spaces to hyphens, punctuation
+    /// dropped. Same shape GitHub generates, so `#daily-context-log` in a file
+    /// written for GitHub lands on the right heading here too.
+    static func slug(_ title: String) -> String {
+        title.lowercased()
+            .replacingOccurrences(of: " ", with: "-")
+            .filter { $0.isLetter || $0.isNumber || $0 == "-" }
+    }
+
+    /// Resolve a link fragment (`#some-heading`) or a heading typed into the
+    /// `aimemoryreader://` URL scheme against a document's headings.
+    static func entry(for fragment: String, in entries: [TOCEntry]) -> TOCEntry? {
+        let wanted = slug(fragment)
+        guard !wanted.isEmpty else { return nil }
+        if let byID = entries.first(where: { $0.id == "toc-\(wanted)" }) { return byID }
+        if let bySlug = entries.first(where: { slug($0.title) == wanted }) { return bySlug }
+        // URL-scheme callers pass human text ("Daily context"), not a slug.
+        return entries.first { $0.title.localizedCaseInsensitiveContains(fragment) }
     }
 }
 

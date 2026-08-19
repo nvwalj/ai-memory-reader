@@ -155,18 +155,22 @@ enum LinkResolver {
     }
 
     // MARK: - String helpers
+    //
+    // Internal rather than private: `RepoLinkResolver` applies the same link
+    // rules to a GitHub tree, where there is no filesystem to ask, and these are
+    // the parts that must not drift between the two.
 
-    private static func splitFragment(_ link: String) -> (path: String, fragment: String?) {
+    static func splitFragment(_ link: String) -> (path: String, fragment: String?) {
         guard let hash = link.firstIndex(of: "#") else { return (link, nil) }
         return (String(link[link.startIndex..<hash]),
                 String(link[link.index(after: hash)...]))
     }
 
-    private static func decode(_ s: String) -> String {
+    static func decode(_ s: String) -> String {
         s.removingPercentEncoding ?? s
     }
 
-    private static func hasForeignScheme(_ path: String) -> Bool {
+    static func hasForeignScheme(_ path: String) -> Bool {
         guard let regex = foreignSchemePattern else { return false }
         let range = NSRange(path.startIndex..<path.endIndex, in: path)
         return regex.firstMatch(in: path, range: range) != nil

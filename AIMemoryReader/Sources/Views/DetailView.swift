@@ -43,8 +43,9 @@ struct MarkdownDetailView: View {
     /// The file exactly as it is on disk. Drives edit mode, saving, and the
     /// character count — never the rendering.
     @State private var rawContent: String?
-    /// What the renderers see: `rawContent` with `[[wiki links]]` expanded into
-    /// real markdown links. Kept separate so edit mode still shows the source.
+    /// What the renderers see: `rawContent` after `MarkdownDisplayPrep` — wiki
+    /// links expanded, HTML comments hidden. Kept separate so edit mode and
+    /// saving still work on the file's real text.
     @State private var displayContent: String = ""
     @State private var editableContent: String = ""
     @State private var loadError: String?
@@ -357,7 +358,7 @@ struct MarkdownDetailView: View {
                 tocEntries = []
                 sections = Self.makeJSONSections(editableContent)
             } else {
-                let display = WikiLinkRewriter.rewrite(editableContent)
+                let display = MarkdownDisplayPrep.prepare(editableContent)
                 displayContent = display
                 tocEntries = TOCParser.parse(display)
                 sections = MarkdownSplitter.split(display, entries: tocEntries)
@@ -570,7 +571,7 @@ struct MarkdownDetailView: View {
                 tocEntries = []
                 sections = Self.makeJSONSections(pretty)
             } else {
-                let display = WikiLinkRewriter.rewrite(text)
+                let display = MarkdownDisplayPrep.prepare(text)
                 rawContent = text
                 displayContent = display
                 editableContent = text

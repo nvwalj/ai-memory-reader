@@ -120,64 +120,98 @@ struct MacContentView: View {
 #if os(iOS)
 struct iOSContentView: View {
     @Environment(AppState.self) private var appState
-    @State private var showDocumentPicker = false
+    @State private var library = RepoLibrary()
+    @State private var path: [AppRoute] = []
+    @State private var didRestore = false
 
     var body: some View {
-        NavigationStack {
-            iOSFileListView()
-                .navigationTitle("AI Memory Reader")
-                .navigationBarTitleDisplayMode(.large)
-                .toolbar {
-                    ToolbarItem(placement: .primaryAction) {
-                        Button {
-                            showDocumentPicker = true
-                        } label: {
-                            Image(systemName: "folder.badge.plus")
-                        }
-                    }
+        NavigationStack(path: $path) {
+            RepoLibraryView(path: $path)
+                .navigationDestination(for: AppRoute.self) { route in
+                    destination(for: route)
                 }
-                .sheet(isPresented: $showDocumentPicker) {
-                    DocumentPickerView { url in
-                        appState.openSingleFile(url)
-                    }
-                }
+        }
+        .environment(library)
+        .onChange(of: path) { _, newPath in
+            guard didRestore else { return }
+            NavigationRestore.save(newPath)
         }
         .task {
+            // Restore after the first render, not as the initial `@State` value:
+            // a NavigationStack that is born with a non-empty path drops it,
+            // because its destinations aren't registered yet at that point.
+            if !didRestore {
+                let saved = NavigationRestore.load()
+                if !saved.isEmpty { path = saved }
+                didRestore = true
+            }
             await appState.detectSourcesIfNeeded()
         }
+        .onChange(of: appState.pendingRepoLink) { _, link in
+            guard let link else { return }
+            appState.pendingRepoLink = nil
+            Task { await follow(link) }
+        }
     }
-}
 
-struct iOSFileListView: View {
-    @Environment(AppState.self) private var appState
+    /// Turn a `aimemoryreader://repo?…` link into a navigation path, adding the
+    /// repository first if it isn't in the list yet.
+    private func follow(_ link: AppState.RepoDeepLink) async {
+        var repo = library.repos.first { $0.owner == link.repo.owner && $0.name == link.repo.name }
+        if repo == nil {
+            repo = await library.add(link.repo.webURL?.absoluteString ?? link.repo.slug)
+        }
+        guard let repo else { return }
 
-    var body: some View {
-        Group {
-            if let root = appState.rootNode, let children = root.children, !children.isEmpty {
-                List {
-                    ForEach(children) { node in
-                        iOSFileNodeRow(node: node)
-                    }
-                }
-                .listStyle(.insetGrouped)
+        let session = library.session(for: repo)
+        await session.load()
+        guard let document = link.documentPath, !document.isEmpty else {
+            path = [.repoFolder(repoID: repo.id, path: repo.subpath ?? "")]
+            return
+        }
+        if let heading = link.heading {
+            session.pendingHeading = (path: document, heading: heading)
+        }
+        path = [
+            .repoFolder(repoID: repo.id, path: repo.subpath ?? ""),
+            .repoDocument(repoID: repo.id, path: document),
+        ]
+    }
+
+    /// One switch for every push in the app. A typed path is what lets a link
+    /// inside a document push the document it points at — nested
+    /// `NavigationLink` destinations can only go one level at a time.
+    @ViewBuilder
+    private func destination(for route: AppRoute) -> some View {
+        switch route {
+        case .settings:
+            GitHubSettingsView()
+        case .repoFolder(let repoID, let folder):
+            if let repo = library.repos.first(where: { $0.id == repoID }) {
+                RepoBrowserView(path: $path, repo: repo, folderPath: folder)
             } else {
-                VStack(spacing: 16) {
-                    Image(systemName: "doc.text.magnifyingglass")
-                        .font(.system(size: 48))
-                        .foregroundStyle(.secondary)
-                    Text("No files loaded")
-                        .font(.title3)
-                        .foregroundStyle(.secondary)
-                    Text("Tap the folder icon to open a file")
-                        .font(.subheadline)
-                        .foregroundStyle(.tertiary)
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                missingRepo
+            }
+        case .repoDocument(let repoID, let document):
+            if let repo = library.repos.first(where: { $0.id == repoID }) {
+                RepoDocumentView(path: $path, repo: repo, documentPath: document)
+            } else {
+                missingRepo
             }
         }
     }
+
+    private var missingRepo: some View {
+        ContentUnavailableView(
+            "Repository removed",
+            systemImage: "shippingbox",
+            description: Text("This repository is no longer in your list.")
+        )
+    }
 }
 
+/// A row for a local file or folder, used in the home screen's "On This Device"
+/// section. Repository documents have their own row type in `RepoViews`.
 struct iOSFileNodeRow: View {
     @Environment(AppState.self) private var appState
     let node: FileNode
@@ -349,7 +383,7 @@ struct iOSDetailView: View {
                 tocEntries = []
                 sections = [MarkdownSection(id: "json-content", content: "```json\n\(displayText)\n```")]
             } else {
-                let display = WikiLinkRewriter.rewrite(text)
+                let display = MarkdownDisplayPrep.prepare(text)
                 rawContent = text
                 tocEntries = TOCParser.parse(display)
                 sections = MarkdownSplitter.split(display, entries: tocEntries)
@@ -374,9 +408,17 @@ import MarkdownUI
 
 struct MarkdownSectionView: View {
     let section: MarkdownSection
+    /// Where relative image URLs point. Set for repository documents so a
+    /// README's screenshots load from GitHub's raw CDN; nil for local files,
+    /// where relative images are already resolved on disk.
+    ///
+    /// Only the *image* base is set on purpose. Setting MarkdownUI's `baseURL`
+    /// too would rewrite every relative link into an absolute github.com URL,
+    /// and links between documents would open Safari instead of navigating.
+    var imageBaseURL: URL? = nil
 
     var body: some View {
-        Markdown(section.content)
+        Markdown(section.content, imageBaseURL: imageBaseURL)
             .markdownTheme(.memoryReader)
             .markdownCodeSyntaxHighlighter(.splash)
             .textSelection(.enabled)

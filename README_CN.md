@@ -63,6 +63,15 @@ AI Memory Reader 是免费开源软件。三种支持方式：
 - **macOS** — 完整功能：侧边栏、目录大纲、编辑模式
 - **iPhone** — 只读模式，原生导航，支持从文件 App 打开
 
+### 在 iPhone 上浏览 GitHub 仓库
+- **通过 URL 添加仓库** — 粘贴 `owner/repo` 或任何 github.com 链接。指向分支或文件夹的链接（`.../tree/main/docs`）会把浏览范围限定到该文件夹。公开仓库无需任何设置
+- **所有可读文档** — 支持 Markdown、`.txt`、JSON/JSONL、YAML、TOML，以及不带扩展名的 `README`/`LICENSE`/`CHANGELOG`。没有可读文档的文件夹会被隐藏，这样你不用一层层点进 `src/` 和 `node_modules/`。开启 **AI Memory Files Only** 后，只显示 `CLAUDE.md` 这类 AI 记忆文件
+- **离线可用** — 列表和你打开过的每个文档都会缓存；之前打开过的仓库无需等待网络。文件按 git SHA 建立索引，所以刷新时只下载有变化的内容
+- **链接原地跳转** — 支持相对路径和 `../` 路径、根目录相对路径、`#heading`、`file.md#heading`、`[[wiki links]]`，以及文件夹链接。README 图片会从 GitHub 的 raw CDN 加载
+- **搜索** — 可按文件名或路径搜索整个仓库；下拉刷新；在 github.com 打开当前文件，或分享它的链接
+- **私有仓库** — 在设置里添加 GitHub 令牌（存入钥匙串 Keychain，仅限本设备，从不同步）。同时把 API 限额从每小时 60 次提高到 5,000 次
+- **深层链接** — `aimemoryreader://repo?owner=…&name=…&path=docs/guide.md&heading=Setup`
+
 ### 保持最新
 - **更新提示** — 启动时（24 小时内最多一次）会向 GitHub 查询是否有新版本，发现新版会显示顶部横幅。点 "Download" 跳转到 release 页面，"Skip This Version" 屏蔽该版本，"Check for Updates…" 在 Help 菜单里。Mac App Store 版本会跳过此逻辑（系统自带更新）。
 

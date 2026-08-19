@@ -123,6 +123,17 @@ final class AppState {
 
     var pendingHeading: PendingHeading?
 
+    /// A `aimemoryreader://repo?…` link waiting for the iOS shell to turn it into
+    /// a navigation path. Parsed here so the URL grammar lives in one place, but
+    /// acted on there, because only that layer owns the repository list.
+    struct RepoDeepLink: Equatable {
+        var repo: GitHubRepoRef
+        var documentPath: String?
+        var heading: String?
+    }
+
+    var pendingRepoLink: RepoDeepLink?
+
     // MARK: - Navigation history
 
     /// Files visited in this window, oldest first. Capped so a long reading
@@ -559,6 +570,30 @@ final class AppState {
 
     func handleURL(_ url: URL) {
         guard url.scheme == "aimemoryreader" else { return }
+
+        // aimemoryreader://repo?url=https://github.com/owner/name
+        // aimemoryreader://repo?owner=…&name=…&ref=…&path=docs/guide.md&heading=Setup
+        if url.host == "repo" {
+            let items = URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems ?? []
+            func value(_ key: String) -> String? {
+                items.first { $0.name == key }?.value?.nilIfEmpty
+            }
+            var repo: GitHubRepoRef?
+            if let raw = value("url") ?? value("repo") {
+                repo = GitHubRepoRef.parse(raw)
+            } else if let owner = value("owner"), let name = value("name") {
+                repo = GitHubRepoRef.parse("\(owner)/\(name)")
+            }
+            guard var repo else { return }
+            if let ref = value("ref") { repo.ref = ref }
+            if let subpath = value("subpath") { repo.subpath = subpath }
+            pendingRepoLink = RepoDeepLink(
+                repo: repo,
+                documentPath: value("path"),
+                heading: value("heading")
+            )
+            return
+        }
 
         if url.host == "open" || url.path.isEmpty {
             let components = URLComponents(url: url, resolvingAgainstBaseURL: false)

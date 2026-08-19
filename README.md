@@ -66,6 +66,15 @@ AI Memory Reader is free and open source. Three ways to support development:
 - **macOS** — Full-featured with sidebar, TOC, edit mode
 - **iPhone** — Read-only with native navigation and Files app integration
 
+### On iPhone: browse a GitHub repository
+- **Add a repo by URL** — paste `owner/repo` or any github.com link. A link to a branch or folder (`.../tree/main/docs`) scopes the browse to that folder. Public repos need no setup at all
+- **Every readable document** — Markdown, `.txt`, JSON/JSONL, YAML, TOML, and bare `README`/`LICENSE`/`CHANGELOG`. Folders with nothing readable in them are pruned, so you're not tapping through `src/` and `node_modules/`. Flip **AI Memory Files Only** to narrow it to `CLAUDE.md`-shaped files
+- **Works offline** — the listing and every document you open are cached; a repo you've opened before never waits on the network. Files are keyed by their git SHA, so a refresh only downloads what changed
+- **Links navigate in place** — relative and `../` paths, root-relative paths, `#heading`, `file.md#heading`, `[[wiki links]]`, and folder links. README images load from GitHub's raw CDN
+- **Search** the whole repo by filename or path; pull to refresh; open the current file on github.com or share its link
+- **Private repos** — add a GitHub token in Settings (Keychain, this device only, never synced). Also lifts the API limit from 60 to 5,000 requests an hour
+- **Deep links** — `aimemoryreader://repo?owner=…&name=…&path=docs/guide.md&heading=Setup`
+
 ### Stay Current
 - **Update Notifier** — On launch (max once per 24h), the app checks GitHub for a newer release and shows a non-blocking banner. "Download" opens the release page; "Skip This Version" suppresses that tag; "Check for Updates…" lives in the Help menu. Mac App Store builds skip this entirely — Apple handles updates there.
 

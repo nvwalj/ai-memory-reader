@@ -13,6 +13,13 @@ final class FileNode: Identifiable, Hashable {
     /// Used in the "show all" mode. Strict mode uses MemoryFileMatcher.
     static let supportedExtensions: Set<String> = ["md", "mdx", "mdc", "json", "jsonl", "ndjson", "yaml", "yml"]
 
+    /// Everything the reader can display. Wider than `supportedExtensions`,
+    /// which exists to keep a *local AI tool directory* free of noise; a GitHub
+    /// repository is browsed for its documents, so plain text and `.markdown`
+    /// belong too.
+    static let documentExtensions: Set<String> =
+        supportedExtensions.union(["markdown", "mdown", "txt", "text", "toml"])
+
     var isMarkdown: Bool { ["md", "mdx", "mdc"].contains(url.pathExtension.lowercased()) }
     var isJSON: Bool { ["json", "jsonl", "ndjson"].contains(url.pathExtension.lowercased()) }
 

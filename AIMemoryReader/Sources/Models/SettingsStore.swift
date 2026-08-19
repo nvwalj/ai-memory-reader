@@ -20,6 +20,11 @@ final class SettingsStore: @unchecked Sendable {
         static let lastLocalFolderPath = "lastLocalFolderPath"
         static let appTheme = "appTheme"
         static let showAllJsonFiles = "showAllJsonFiles"
+        // GitHub repositories added on iOS. Public identifiers only — the token
+        // that may be needed to read them lives in the Keychain, not here, and
+        // deliberately does not sync.
+        static let githubRepos = "githubRepos"
+        static let githubMemoryFilesOnly = "githubMemoryFilesOnly"
     }
 
     private init() {
@@ -72,6 +77,32 @@ final class SettingsStore: @unchecked Sendable {
     var showAllJsonFiles: Bool {
         get { bool(forKey: Key.showAllJsonFiles, default: false) }
         set { setBool(newValue, forKey: Key.showAllJsonFiles) }
+    }
+
+    /// Added GitHub repositories, most-recent first. Stored as JSON strings so
+    /// the iCloud key-value store (which only takes property-list types) can
+    /// carry them between devices.
+    var githubRepos: [GitHubRepoRef] {
+        get {
+            (stringArray(forKey: Key.githubRepos) ?? []).compactMap { json in
+                guard let data = json.data(using: .utf8) else { return nil }
+                return try? JSONDecoder().decode(GitHubRepoRef.self, from: data)
+            }
+        }
+        set {
+            let encoded = newValue.compactMap { repo -> String? in
+                guard let data = try? JSONEncoder().encode(repo) else { return nil }
+                return String(data: data, encoding: .utf8)
+            }
+            set(encoded, forKey: Key.githubRepos)
+        }
+    }
+
+    /// When true, a repository lists only files that look like AI memory/config
+    /// (per `MemoryFileMatcher`) instead of every readable document.
+    var githubMemoryFilesOnly: Bool {
+        get { bool(forKey: Key.githubMemoryFilesOnly, default: false) }
+        set { setBool(newValue, forKey: Key.githubMemoryFilesOnly) }
     }
 
     // MARK: - Private read/write helpers

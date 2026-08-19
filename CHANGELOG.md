@@ -3,6 +3,46 @@
 All notable changes to AI Memory Reader. Full release notes and downloads:
 https://github.com/nvwalj/ai-memory-reader/releases
 
+## Unreleased
+
+**iPhone: read any GitHub repository's documents.**
+
+- Add a repository by pasting `owner/repo` or any github.com link — including a
+  link to a branch or a folder, like `.../tree/main/docs`, which scopes the
+  browse to that folder. Until now the iOS app had no content source at all:
+  source auto-discovery returns nothing on iOS, so it could only open a file
+  you handed it through the document picker.
+- Browses every readable document — Markdown, `.txt`, JSON/JSONL, YAML, TOML,
+  and bare `README`/`LICENSE`/`CHANGELOG`. Folders holding nothing readable are
+  pruned, so a repo doesn't open onto a wall of `src/` and `node_modules/`.
+  A **AI Memory Files Only** switch narrows it to the same rule the macOS
+  sidebar uses in strict mode.
+- **Works offline.** The listing and every document you open are cached and
+  read back without a connection; a repo you've opened before never waits on
+  the network again. Blobs are keyed by their git SHA, so refreshing only
+  downloads what actually changed.
+- **Links navigate in place**, with the same rules as the macOS reader:
+  relative and `../` paths, root-relative `/docs/guide.md`, `#heading` and
+  `file.md#heading`, `[[wiki links]]`, and folder links. Images in a README
+  load from GitHub's raw CDN.
+- Search a whole repository by filename or path, refresh by pull-to-refresh,
+  and open the current file on github.com or share its link.
+- **Private repositories** work with a GitHub token added in Settings, stored
+  in the device Keychain — never synced, never sent anywhere but api.github.com.
+  Public browsing needs no setup; a token also lifts the API limit from 60 to
+  5,000 requests an hour. Settings shows how much is cached and can clear it.
+- The app reopens where you left off, and `aimemoryreader://repo?owner=…&name=…&path=…&heading=…`
+  opens a specific document — the iOS counterpart of the macOS URL scheme.
+
+**Both platforms**
+
+- HTML comments are no longer rendered as visible text. CommonMark passes
+  `<!-- … -->` through as raw HTML and the renderer drew it literally, which is
+  loud in AI memory files, where comments are notes addressed to agents. They
+  now hide, the way every other Markdown surface hides them — except inside a
+  fenced block, so a document explaining the syntax still shows it. The file on
+  disk is untouched; edit mode still shows the comment.
+
 ## v0.5.4 — 2026-08-15
 
 **Links between local files now navigate inside the app.**

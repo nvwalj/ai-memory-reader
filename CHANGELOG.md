@@ -34,6 +34,28 @@ https://github.com/nvwalj/ai-memory-reader/releases
 - The app reopens where you left off, and `aimemoryreader://repo?owner=…&name=…&path=…&heading=…`
   opens a specific document — the iOS counterpart of the macOS URL scheme.
 
+**macOS: reloading the open file is now yours to trigger — and it works.**
+
+- **The open document no longer reloads itself.** It used to try, and on a live
+  source it would have rewritten the page under you mid-paragraph. Reading
+  something briefly out of date is better than watching it change while your
+  eye is on it, so the reload is now always a decision you make.
+- **Reload from Disk (⌘R)**, in the File menu and as a button in the title bar.
+  It works in edit mode too, committing any pending edit first, so asking for
+  the disk copy can never be the thing that loses your typing.
+- **"Changed on disk"** appears next to that button when the file you're reading
+  has moved on. It compares that one file's timestamp — filesystem events cover
+  the whole folder, so a busy neighbour doesn't light it up. Nothing on the page
+  moves; it is a label you can ignore.
+- Fixed the scheduling behind all of this, which was starving. The document
+  signal and the sidebar's directory re-walk shared one 500 ms trailing debounce
+  that every new filesystem event cancelled — so on a source that is
+  *continuously* written, which is what `~/.claude/projects` is while an agent
+  appends to session logs, the timer never reached its deadline and **the
+  sidebar stopped picking up new files for as long as the agent kept working**.
+  The two are now scheduled independently, and the re-walk can no longer be
+  postponed past two seconds no matter how constant the writes.
+
 **Both platforms**
 
 - HTML comments are no longer rendered as visible text. CommonMark passes

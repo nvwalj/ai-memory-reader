@@ -47,7 +47,7 @@ AI Memory Reader is free and open source. Three ways to support development:
 - **Links That Go Somewhere** — Click a link to another local file and it opens in the reader, selected in the sidebar, instead of bouncing you out to whatever app owns `.md`. Relative paths, `../` paths, absolute and `~/` paths all work; `file.md#heading` lands on the heading, `#heading` jumps within the page. **⌘[ / ⌘]** move back and forward through everything you've opened. Links to a folder load it in the sidebar; images, PDFs, and source files still open in their usual app
 - **Wiki Links** — `[[name]]` and `[[target|label]]` are clickable, so Claude's cross-referenced memory files and Obsidian vaults navigate the way they were written. Matching ignores separators and case, so `[[user-profile]]` finds `user_profile.md`. Display-only — edit mode still shows the file's real text
 - **Dark & Light Themes** — Follows system appearance
-- **File Watching** — Auto-refreshes when files change on disk
+- **File Watching** — The sidebar keeps up with files appearing and changing on disk, including while an agent is actively writing to the folder. The document you're reading never rewrites itself: instead a **"Changed on disk"** marker appears when that file has moved on, and **⌘R** reloads it when *you* decide (also a button in the title bar). ⌘R commits any pending edit first, so asking for the disk copy can never cost you typing
 - **Full-Text Search** — Search across all files in the current directory
 
 ### Editing
@@ -150,6 +150,7 @@ aimr open ~/.openclaw/workspace/MEMORY.md --heading "About Me"
 | ⌘O | Open file or folder |
 | ⌘E | Toggle edit/read mode |
 | ⌘S | Save (in edit mode) |
+| ⌘R | Reload the open file from disk |
 | ⌘F | Focus search |
 | ⌘[ | Back — the file you were reading before |
 | ⌘] | Forward |

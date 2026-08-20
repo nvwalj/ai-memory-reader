@@ -89,10 +89,27 @@ final class AppState {
     private var activeStream: FSEventStreamRef?
     private var fsObserver: Any?
     private var debounceTask: Task<Void, Never>?
+    private var debounceStartedAt: Date?
+    private var lastReloadSignal: Date = .distantPast
     #endif
 
-    /// Incremented on each file-system change so views can react
+    /// Incremented on each file-system change so views can react.
+    ///
+    /// The detail view uses it to re-check whether the file it is showing has
+    /// changed underneath — **not** to reload it. Text that rewrites itself
+    /// while you are reading is worse than text that is briefly out of date, so
+    /// the reload is always the reader's decision (⌘R).
     var fileChangeToken: Int = 0
+
+    /// Pulsed by "Reload from Disk" (⌘R). Separate from `fileChangeToken`: that
+    /// one is skipped while editing, because a reload mid-edit would throw the
+    /// edit away, whereas an explicit reload is something the user asked for and
+    /// saves first.
+    var reloadToken: Int = 0
+
+    func requestReload() {
+        reloadToken &+= 1
+    }
 
     // MARK: - Suggested Rules (v0.5)
     /// Cached scan results, sorted by frequency desc.
@@ -693,25 +710,55 @@ final class AppState {
             queue: .main
         ) { [weak self] _ in
             Task { @MainActor in
-                // Debounce rapid FSEvents — wait 0.5s of quiet before rebuilding
-                self?.debounceTask?.cancel()
-                self?.debounceTask = Task { @MainActor in
-                    try? await Task.sleep(for: .milliseconds(500))
-                    guard !Task.isCancelled else { return }
-                    self?.handleFileSystemChange()
-                }
+                self?.fileSystemEventArrived()
             }
         }
         #endif
     }
 
     #if os(macOS)
+    /// Nudge the open document to re-check its own timestamp at most this often.
+    private static let staleCheckThrottle: TimeInterval = 0.3
+    /// Quiet period before re-walking the directory.
+    private static let treeDebounce: Duration = .milliseconds(500)
+    /// …and the longest the re-walk may be postponed by continuous events.
+    private static let treeMaxWait: TimeInterval = 2.0
+
+    private func fileSystemEventArrived() {
+        let now = Date()
+
+        // Two independent halves, deliberately not sharing a timer. They used to:
+        // both waited on one trailing debounce that every new event cancelled, so
+        // on a source that is *always* being written — `~/.claude/projects`, where
+        // agents append to session logs continuously, which is this app's main
+        // source — the timer never reached its deadline and neither half ever ran.
+        // The sidebar went stale for as long as the agent kept working.
+        if now.timeIntervalSince(lastReloadSignal) >= Self.staleCheckThrottle {
+            lastReloadSignal = now
+            fileChangeToken &+= 1
+        }
+
+        // The directory re-walk keeps its trailing debounce, but with a ceiling
+        // for the same reason — continuous writes must not postpone it forever.
+        if debounceStartedAt == nil { debounceStartedAt = now }
+        debounceTask?.cancel()
+        if let started = debounceStartedAt, now.timeIntervalSince(started) >= Self.treeMaxWait {
+            debounceStartedAt = nil
+            handleFileSystemChange()
+            return
+        }
+        debounceTask = Task { @MainActor [weak self] in
+            try? await Task.sleep(for: Self.treeDebounce)
+            guard !Task.isCancelled, let self else { return }
+            self.debounceStartedAt = nil
+            self.handleFileSystemChange()
+        }
+    }
+    #endif
+
+    #if os(macOS)
     private func handleFileSystemChange() {
         guard let rootURL else { return }
-
-        // Tell the detail view to reload the open file's content from disk. This
-        // is the cheap half and shouldn't wait on the directory walk.
-        fileChangeToken += 1
 
         // Re-walk off the main actor. On a busy source like ~/.claude/projects
         // this fires every time an agent appends to a session log, so doing it

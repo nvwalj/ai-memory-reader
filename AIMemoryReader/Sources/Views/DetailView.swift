@@ -52,6 +52,11 @@ struct MarkdownDetailView: View {
     /// Transient message shown when a link points at nothing.
     @State private var linkError: String?
     @State private var linkErrorTask: Task<Void, Never>?
+    /// Modification date of the copy currently on screen, used to notice when
+    /// the file has moved on without us.
+    @State private var loadedModificationDate: Date?
+    /// True once the file on disk differs from what is displayed.
+    @State private var hasDiskChanges = false
     @State private var tocEntries: [TOCEntry] = []
     @State private var sections: [MarkdownSection] = []
     @State private var activeEntryID: String?
@@ -131,13 +136,17 @@ struct MarkdownDetailView: View {
             await loadFile()
         }
         .onChange(of: fileChangeToken) { _, _ in
-            // Only reload from disk if we're not in edit mode (avoid overwriting edits)
-            if !isEditMode {
-                Task { await loadFile() }
-            }
+            // Deliberately does not reload. Something in the folder changed;
+            // check whether it was *this* file and, if so, say so. Swapping the
+            // text out from under someone mid-paragraph is disorienting, and on
+            // a live source it would happen constantly.
+            refreshStaleFlag()
         }
         .onChange(of: appState.findInFileToken) { _, _ in
             openFind()
+        }
+        .onChange(of: appState.reloadToken) { _, _ in
+            reloadFromDisk()
         }
         .onChange(of: palette.isEyeCare) { _, _ in
             // Palette shifted — rebuild the find-mode rendering so colors match.
@@ -194,6 +203,34 @@ struct MarkdownDetailView: View {
                 Text("\(raw.count) chars")
                     .font(.caption)
                     .foregroundColor(palette.isEyeCare ? palette.secondaryText : .secondary)
+            }
+
+            // The one place the app admits the file has moved on. It never
+            // reloads by itself — this is a label you can ignore, not a change
+            // to what you're reading.
+            if hasDiskChanges {
+                Button {
+                    reloadFromDisk()
+                } label: {
+                    HStack(spacing: 4) {
+                        Image(systemName: "arrow.clockwise.circle.fill")
+                        Text("Changed on disk")
+                            .font(.caption)
+                    }
+                    .foregroundColor(palette.accent)
+                }
+                .buttonStyle(.plain)
+                .help("This file changed on disk since you opened it — reload (⌘R)")
+                .transition(.opacity)
+            } else {
+                Button {
+                    reloadFromDisk()
+                } label: {
+                    Image(systemName: "arrow.clockwise")
+                        .foregroundColor(palette.isEyeCare ? palette.secondaryText : .secondary)
+                }
+                .buttonStyle(.plain)
+                .help("Reload this file from disk (⌘R)")
             }
 
             // Edit/Preview toggle button
@@ -421,6 +458,38 @@ struct MarkdownDetailView: View {
         saveIfNeeded()
     }
 
+    // MARK: - Reload (⌘R)
+
+    /// Re-read the file from disk on demand — the only thing that ever replaces
+    /// what is on screen. Works in edit mode too: it commits pending edits
+    /// first, so asking for the disk copy can never be what loses your typing.
+    private func reloadFromDisk() {
+        if isEditMode {
+            autoSaveTask?.cancel()
+            saveIfNeeded()
+        }
+        Task { await loadFile() }
+    }
+
+    /// Compare the file's timestamp against the copy on screen. FSEvents reports
+    /// the whole folder, so most events are about some other file and must not
+    /// light up this indicator.
+    private func refreshStaleFlag() {
+        guard rawContent != nil else { return }
+        let current = try? fileNode.url
+            .resourceValues(forKeys: [.contentModificationDateKey]).contentModificationDate
+        guard let current else {
+            // Deleted or unreadable — leave what's on screen and stay quiet;
+            // the sidebar is what tells the user the file is gone.
+            return
+        }
+        if let loaded = loadedModificationDate {
+            hasDiskChanges = current > loaded
+        } else {
+            loadedModificationDate = current
+        }
+    }
+
     // MARK: - Find in File
 
     private func openFind() {
@@ -556,6 +625,9 @@ struct MarkdownDetailView: View {
         loadError = nil
         isEditMode = false
         saveState = .idle
+        hasDiskChanges = false
+        loadedModificationDate = try? fileNode.url
+            .resourceValues(forKeys: [.contentModificationDateKey]).contentModificationDate
         do {
             let data = try Data(contentsOf: fileNode.url)
             guard let text = String(data: data, encoding: .utf8) else {

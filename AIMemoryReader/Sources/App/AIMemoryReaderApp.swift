@@ -120,6 +120,14 @@ struct AIMemoryReaderApp: App {
             }
 
             CommandGroup(replacing: .saveItem) {
+                Button("Reload from Disk") {
+                    appState.requestReload()
+                }
+                .keyboardShortcut("r", modifiers: .command)
+                .disabled(appState.selectedFile == nil)
+
+                Divider()
+
                 Button("Save") {
                     NotificationCenter.default.post(name: .editorManualSave, object: nil)
                 }
